@@ -21,22 +21,28 @@ const EXTERNAL_URLS = {
 
 export default function Home() {
   useEffect(() => {
+    console.log('[FunnelA] 🚀 Page loaded');
     captureAcquisitionFromUrl();
     const acq = getAcquisitionParams();
-    track('landing_view', {
+    console.log('[FunnelA] 📊 Acquisition params:', acq);
+    track('FunnelA_PageView', {
       path: '/',
       variant: 'funnel_a',
       ...acq,
     });
   }, []);
 
-  const handleCTAClick = (cta: string, url: string) => {
+  const handleCTAClick = (cta: string, url: string, eventName: string) => {
+    console.log('[FunnelA] 🖱️ Button clicked:', { cta, url, eventName });
     const acq = getAcquisitionParams();
-    track('cta_click', {
+    // Emit specific Funnel-A event
+    track(eventName, {
       cta,
       variant: 'funnel_a',
+      url,
       ...acq,
     });
+    console.log('[FunnelA] 🔗 Redirecting to:', appendAcqParams(url));
     window.location.href = appendAcqParams(url);
   };
 
@@ -75,7 +81,7 @@ export default function Home() {
 
           <div className="flex flex-col items-center justify-center gap-6 mb-12 max-w-md mx-auto">
             <PrimaryButton
-              onClick={() => handleCTAClick('hero_studio', EXTERNAL_URLS.studio)}
+              onClick={() => handleCTAClick('hero_studio', EXTERNAL_URLS.studio, 'FunnelA_EiGestalten_Click')}
               className="w-full text-lg"
             >
               Ei gestalten
@@ -86,7 +92,7 @@ export default function Home() {
             </p>
 
             <SecondaryButton
-              onClick={() => handleCTAClick('hero_games', EXTERNAL_URLS.games)}
+              onClick={() => handleCTAClick('hero_games', EXTERNAL_URLS.games, 'FunnelA_JetztSpielen_Click')}
               className="w-full text-lg"
             >
               Jetzt spielen
@@ -162,13 +168,13 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
             <PrimaryButton
-              onClick={() => handleCTAClick('steps_studio', EXTERNAL_URLS.studio)}
+              onClick={() => handleCTAClick('steps_studio', EXTERNAL_URLS.studio, 'FunnelA_EiGestalten_Click')}
               className="w-full sm:w-auto"
             >
               Ei gestalten
             </PrimaryButton>
             <SecondaryButton
-              onClick={() => handleCTAClick('steps_presets', EXTERNAL_URLS.presets)}
+              onClick={() => handleCTAClick('steps_presets', EXTERNAL_URLS.presets, 'FunnelA_Presets_Click')}
               className="w-full sm:w-auto"
             >
               Zu den Presets
@@ -201,7 +207,7 @@ export default function Home() {
                   Bau Karten, die nach dir aussehen – nicht nach Template.
                 </p>
                 <PrimaryButton
-                  onClick={() => handleCTAClick('card_studio', EXTERNAL_URLS.studio)}
+                  onClick={() => handleCTAClick('card_studio', EXTERNAL_URLS.studio, 'FunnelA_EiGestalten_Click')}
                   className="w-full mt-6"
                 >
                   Ei gestalten
@@ -223,7 +229,7 @@ export default function Home() {
                   Stell dir ein Deck zusammen und spiel's direkt.
                 </p>
                 <SecondaryButton
-                  onClick={() => handleCTAClick('card_games', EXTERNAL_URLS.games)}
+                  onClick={() => handleCTAClick('card_games', EXTERNAL_URLS.games, 'FunnelA_JetztSpielen_Click')}
                   className="w-full mt-6"
                 >
                   Jetzt spielen
@@ -245,7 +251,7 @@ export default function Home() {
                   Schick den Link rum. Freunde können sofort rein.
                 </p>
                 <SecondaryButton
-                  onClick={() => handleCTAClick('card_presets', EXTERNAL_URLS.presets)}
+                  onClick={() => handleCTAClick('card_presets', EXTERNAL_URLS.presets, 'FunnelA_FertigeDecks_Click')}
                   className="w-full mt-6"
                 >
                   Fertige Decks ansehen
@@ -267,13 +273,13 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
             <PrimaryButton
-              onClick={() => handleCTAClick('final_studio', EXTERNAL_URLS.studio)}
+              onClick={() => handleCTAClick('final_studio', EXTERNAL_URLS.studio, 'FunnelA_EiGestalten_Click')}
               className="w-full sm:w-auto"
             >
               Ei gestalten
             </PrimaryButton>
             <SecondaryButton
-              onClick={() => handleCTAClick('final_presets', EXTERNAL_URLS.presets)}
+              onClick={() => handleCTAClick('final_presets', EXTERNAL_URLS.presets, 'FunnelA_FertigeDecks_Click')}
               className="w-full sm:w-auto"
             >
               Fertige Decks ansehen
