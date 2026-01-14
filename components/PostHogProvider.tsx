@@ -25,10 +25,17 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
         person_profiles: 'identified_only', // Same as main site
         defaults: '2025-11-30', // Same as main site
         loaded: (posthog) => {
+          // Mark PostHog as loaded
+          (window as any).posthog = posthog;
+          (window as any).posthog.__loaded = true;
           console.log('[PostHog] ✅ Loaded successfully', {
             distinct_id: posthog.get_distinct_id(),
             api_host: posthogHost,
           });
+          // Dispatch custom event for components waiting for PostHog
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('posthog:loaded'));
+          }
         },
       });
       (window as any).posthog = posthog;

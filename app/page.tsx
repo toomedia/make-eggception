@@ -25,11 +25,35 @@ export default function Home() {
     captureAcquisitionFromUrl();
     const acq = getAcquisitionParams();
     console.log('[FunnelA] 📊 Acquisition params:', acq);
-    track('FunnelA_PageView', {
-      path: '/',
-      variant: 'funnel_a',
-      ...acq,
-    });
+    
+    // Wait for PostHog to be ready before tracking (max 3 seconds)
+    let attempts = 0;
+    const maxAttempts = 30; // 30 * 100ms = 3 seconds max wait
+    
+    const waitForPostHog = () => {
+      attempts++;
+      if ((window as any).posthog && ((window as any).posthog.__loaded || (window as any).posthog.get_distinct_id)) {
+        console.log('[FunnelA] ✅ PostHog ready, tracking page view');
+        track('FunnelA_PageView', {
+          path: '/',
+          variant: 'funnel_a',
+          ...acq,
+        });
+      } else if (attempts < maxAttempts) {
+        // Retry after 100ms if PostHog not ready
+        setTimeout(waitForPostHog, 100);
+      } else {
+        console.warn('[FunnelA] ⚠️ PostHog not ready after 3 seconds, tracking anyway');
+        track('FunnelA_PageView', {
+          path: '/',
+          variant: 'funnel_a',
+          ...acq,
+        });
+      }
+    };
+    
+    // Start waiting for PostHog
+    waitForPostHog();
   }, []);
 
   const handleCTAClick = (cta: string, url: string, eventName: string) => {
