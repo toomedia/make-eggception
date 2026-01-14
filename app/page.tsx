@@ -42,8 +42,15 @@ export default function Home() {
       url,
       ...acq,
     });
-    console.log('[FunnelA] 🔗 Redirecting to:', appendAcqParams(url));
-    window.location.href = appendAcqParams(url);
+    
+    // Give PostHog time to send the event before redirecting
+    const redirectUrl = appendAcqParams(url);
+    console.log('[FunnelA] 🔗 Redirecting to:', redirectUrl);
+    
+    // Small delay to ensure event is sent to PostHog
+    setTimeout(() => {
+      window.location.href = redirectUrl;
+    }, 100);
   };
 
   return (

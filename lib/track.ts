@@ -13,14 +13,28 @@ export function track(name: string, props?: Record<string, any>): void {
   console.log('[Track] 🎯 Tracking event:', name, enrichedProps);
 
   // Use PostHog if available (initialized globally)
-  if ((window as any).posthog) {
+  const posthog = (window as any).posthog;
+  if (posthog) {
     try {
-      (window as any).posthog.capture(name, enrichedProps);
-      console.log('[Track] ✅ Event sent to PostHog:', name);
+      // Check if PostHog is ready
+      if (posthog.__loaded || posthog.get_distinct_id) {
+        posthog.capture(name, enrichedProps);
+        console.log('[Track] ✅ Event sent to PostHog:', name, enrichedProps);
+      } else {
+        console.warn('[Track] ⚠️ PostHog not fully loaded yet, queuing event:', name);
+        // Wait a bit and try again
+        setTimeout(() => {
+          if ((window as any).posthog) {
+            (window as any).posthog.capture(name, enrichedProps);
+            console.log('[Track] ✅ Event sent to PostHog (retry):', name);
+          }
+        }, 200);
+      }
     } catch (error) {
-      console.error('[Track] ❌ Error sending event to PostHog:', error);
+      console.error('[Track] ❌ Error sending event to PostHog:', error, name);
     }
   } else {
     console.warn('[Track] ⚠️ PostHog not initialized, event not sent:', name);
+    console.warn('[Track] Available on window:', Object.keys(window).filter(k => k.includes('posthog')));
   }
 }
