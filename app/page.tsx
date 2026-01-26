@@ -11,6 +11,8 @@ import {
   appendAcqParams,
 } from '@/lib/acquisition';
 import { track } from '@/lib/track';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { LanguageToggle } from '@/components/LanguageToggle';
 
 const EXTERNAL_URLS = {
   home: 'https://www.eggception.club/',
@@ -20,6 +22,8 @@ const EXTERNAL_URLS = {
 };
 
 export default function Home() {
+  const { t } = useLanguage();
+
   useEffect(() => {
     console.log('[FunnelA] 🚀 Page loaded');
     captureAcquisitionFromUrl();
@@ -79,6 +83,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black">
+      <LanguageToggle />
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
         <div className="absolute inset-0 z-0">
           <Image
@@ -97,17 +102,21 @@ export default function Home() {
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-8 leading-[1.1] tracking-tight">
-            Wie Memory, nur in d<span className="relative inline-block"><span className="absolute inset-0 bg-blue-500/20 -skew-x-12 rounded"></span><span className="relative text-orange-400">ei</span></span>nem Style.
+            {t('hero.title').split('your style').length > 1 ? (
+              <>Like Memory, but in <span className="relative inline-block"><span className="absolute inset-0 bg-blue-500/20 -skew-x-12 rounded"></span><span className="relative text-orange-400">your</span></span> style.</>
+            ) : (
+              <>Wie Memory, nur in d<span className="relative inline-block"><span className="absolute inset-0 bg-blue-500/20 -skew-x-12 rounded"></span><span className="relative text-orange-400">ei</span></span>nem Style.</>
+            )}
           </h1>
 
           <p className="text-xl sm:text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed font-medium">
-            Kurze Matches. Deine eigenen Karten.
+            {t('hero.subtitle')}
             <br />
-            Browser auf – Prompt rein – Ei raus. Dann Deck bauen & battlen.
+            {t('hero.description')}
           </p>
 
           <p className="text-sm text-white/60 mb-12 max-w-2xl mx-auto">
-            „Ei" = deine erste Karte im Eggception-Style.
+            {t('hero.eggExplanation')}
           </p>
 
           <div className="flex flex-col items-center justify-center gap-6 mb-12 max-w-md mx-auto">
@@ -115,30 +124,30 @@ export default function Home() {
               onClick={() => handleCTAClick('hero_studio', EXTERNAL_URLS.studio, 'FunnelA_EiGestalten_Click')}
               className="w-full text-lg"
             >
-              Ei gestalten
+              {t('hero.createEgg')}
             </PrimaryButton>
 
             <p className="text-sm text-white/70">
-              Kostenlos starten · Ohne Anmeldung
+              {t('hero.freeStart')}
             </p>
 
             <SecondaryButton
               onClick={() => handleCTAClick('hero_games', EXTERNAL_URLS.games, 'FunnelA_JetztSpielen_Click')}
               className="w-full text-lg"
             >
-              Jetzt spielen
+              {t('hero.playNow')}
             </SecondaryButton>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 px-4">
             <div className="px-5 py-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/30">
-              <span className="text-sm font-medium text-white">0 Euro, 100% Fun</span>
+              <span className="text-sm font-medium text-white">{t('hero.badge1')}</span>
             </div>
             <div className="px-5 py-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/30">
-              <span className="text-sm font-medium text-white">Köpfchen statt Glück</span>
+              <span className="text-sm font-medium text-white">{t('hero.badge2')}</span>
             </div>
             <div className="px-5 py-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/30">
-              <span className="text-sm font-medium text-white">Von 6 bis 99</span>
+              <span className="text-sm font-medium text-white">{t('hero.badge3')}</span>
             </div>
           </div>
         </div>
@@ -150,7 +159,7 @@ export default function Home() {
       >
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl sm:text-4xl md:text-5xl font-black text-center mb-10 tracking-tight">
-            In 2 Minuten startklar.
+            {t('howItWorks.title')}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -159,11 +168,11 @@ export default function Home() {
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-white flex items-center justify-center text-3xl font-black mb-6 shadow-xl">
                   1
                 </div>
-                <CardTitle className="text-3xl font-bold">Idee rein</CardTitle>
+                <CardTitle className="text-3xl font-bold">{t('howItWorks.step1Title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-lg leading-relaxed">
-                  Ein Satz reicht. Style, Mood, Thema.
+                  {t('howItWorks.step1Description')}
                 </p>
               </CardContent>
             </Card>
@@ -173,11 +182,11 @@ export default function Home() {
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-white flex items-center justify-center text-3xl font-black mb-6 shadow-xl">
                   2
                 </div>
-                <CardTitle className="text-3xl font-bold">Ei schlüpft</CardTitle>
+                <CardTitle className="text-3xl font-bold">{t('howItWorks.step2Title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-lg leading-relaxed">
-                  Dein erstes Piece ist da. Du kannst nachlegen.
+                  {t('howItWorks.step2Description')}
                 </p>
               </CardContent>
             </Card>
@@ -187,11 +196,11 @@ export default function Home() {
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-white flex items-center justify-center text-3xl font-black mb-6 shadow-xl">
                   3
                 </div>
-                <CardTitle className="text-3xl font-bold">Deck bauen & battlen</CardTitle>
+                <CardTitle className="text-3xl font-bold">{t('howItWorks.step3Title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-lg leading-relaxed">
-                  Mixen, matchen, spielen.
+                  {t('howItWorks.step3Description')}
                 </p>
               </CardContent>
             </Card>
@@ -202,13 +211,13 @@ export default function Home() {
               onClick={() => handleCTAClick('steps_studio', EXTERNAL_URLS.studio, 'FunnelA_EiGestalten_Click')}
               className="w-full sm:w-auto"
             >
-              Ei gestalten
+              {t('howItWorks.createEgg')}
             </PrimaryButton>
             <SecondaryButton
               onClick={() => handleCTAClick('steps_presets', EXTERNAL_URLS.presets, 'FunnelA_Presets_Click')}
               className="w-full sm:w-auto"
             >
-              Zu den Presets
+              {t('howItWorks.toPresets')}
             </SecondaryButton>
           </div>
         </div>
@@ -217,10 +226,10 @@ export default function Home() {
       <section className="py-16 px-6 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl sm:text-4xl md:text-5xl font-black text-center mb-3 tracking-tight">
-            Dein Prompt. Dein Ei. Dein Deck.
+            {t('features.title')}
           </h2>
           <p className="text-center text-muted-foreground mb-10 text-base max-w-2xl mx-auto">
-            Deck = dein Kartenset fürs Battle.
+            {t('features.deckExplanation')}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -230,18 +239,18 @@ export default function Home() {
                   <Sparkles className="w-12 h-12 text-white" strokeWidth={2.5} />
                 </div>
                 <CardTitle className="text-3xl font-bold mb-3">
-                  Klicken
+                  {t('features.click.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground text-lg leading-relaxed">
-                  Bau Karten, die nach dir aussehen – nicht nach Template.
+                  {t('features.click.description')}
                 </p>
                 <PrimaryButton
                   onClick={() => handleCTAClick('card_studio', EXTERNAL_URLS.studio, 'FunnelA_EiGestalten_Click')}
                   className="w-full mt-6"
                 >
-                  Ei gestalten
+                  {t('features.click.cta')}
                 </PrimaryButton>
               </CardContent>
             </Card>
@@ -252,18 +261,18 @@ export default function Home() {
                   <Workflow className="w-12 h-12 text-white" strokeWidth={2.5} />
                 </div>
                 <CardTitle className="text-3xl font-bold mb-3">
-                  Matchen
+                  {t('features.match.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground text-lg leading-relaxed">
-                  Stell dir ein Deck zusammen und spiel's direkt.
+                  {t('features.match.description')}
                 </p>
                 <SecondaryButton
                   onClick={() => handleCTAClick('card_games', EXTERNAL_URLS.games, 'FunnelA_JetztSpielen_Click')}
                   className="w-full mt-6"
                 >
-                  Jetzt spielen
+                  {t('features.match.cta')}
                 </SecondaryButton>
               </CardContent>
             </Card>
@@ -274,18 +283,18 @@ export default function Home() {
                   <Zap className="w-12 h-12 text-white" strokeWidth={2.5} />
                 </div>
                 <CardTitle className="text-3xl font-bold mb-3">
-                  Battlen
+                  {t('features.battle.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground text-lg leading-relaxed">
-                  Schick den Link rum. Freunde können sofort rein.
+                  {t('features.battle.description')}
                 </p>
                 <SecondaryButton
                   onClick={() => handleCTAClick('card_presets', EXTERNAL_URLS.presets, 'FunnelA_FertigeDecks_Click')}
                   className="w-full mt-6"
                 >
-                  Fertige Decks ansehen
+                  {t('features.battle.cta')}
                 </SecondaryButton>
               </CardContent>
             </Card>
@@ -296,10 +305,10 @@ export default function Home() {
       <section className="py-16 px-6 sm:px-6 lg:px-8 bg-muted/30">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl sm:text-4xl md:text-5xl font-black mb-4 tracking-tight">
-            Zeig deinen Style. Nicht deinen Score.
+            {t('final.title')}
           </h2>
           <p className="text-muted-foreground mb-10 max-w-2xl mx-auto text-lg leading-relaxed">
-            Dein Ei ist dein Signature-Move. Teilen per Link – und schauen, wer damit klar kommt.
+            {t('final.description')}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
@@ -307,13 +316,13 @@ export default function Home() {
               onClick={() => handleCTAClick('final_studio', EXTERNAL_URLS.studio, 'FunnelA_EiGestalten_Click')}
               className="w-full sm:w-auto"
             >
-              Ei gestalten
+              {t('final.createEgg')}
             </PrimaryButton>
             <SecondaryButton
               onClick={() => handleCTAClick('final_presets', EXTERNAL_URLS.presets, 'FunnelA_FertigeDecks_Click')}
               className="w-full sm:w-auto"
             >
-              Fertige Decks ansehen
+              {t('final.viewDecks')}
             </SecondaryButton>
           </div>
         </div>
@@ -321,7 +330,7 @@ export default function Home() {
 
       <footer className="py-8 px-4 sm:px-6 lg:px-8 border-t border-border">
         <div className="max-w-6xl mx-auto text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Eggception. Alle Rechte vorbehalten.</p>
+          <p>© {new Date().getFullYear()} Eggception. {t('footer.copyright')}</p>
         </div>
       </footer>
     </div>
