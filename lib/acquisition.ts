@@ -1,4 +1,5 @@
 const ACQ_KEY = 'acq';
+const ATTRIBUTION_ID_KEY = 'attribution_id';
 
 export interface AcquisitionParams {
   utm_source?: string;
@@ -9,6 +10,32 @@ export interface AcquisitionParams {
   gclid?: string;
   fbclid?: string;
   ttclid?: string;
+  msclkid?: string;
+  landing_path?: string;
+  landing_url?: string;
+  referrer?: string;
+  captured_at?: string;
+  attribution_id?: string;
+}
+
+function generateAttributionId(): string {
+  return `attr_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+}
+
+export function getOrCreateAttributionId(): string {
+  if (typeof window === 'undefined') return '';
+  
+  try {
+    let attributionId = localStorage.getItem(ATTRIBUTION_ID_KEY);
+    if (!attributionId) {
+      attributionId = generateAttributionId();
+      localStorage.setItem(ATTRIBUTION_ID_KEY, attributionId);
+    }
+    return attributionId;
+  } catch (e) {
+    console.error('Failed to get/create attribution ID:', e);
+    return generateAttributionId();
+  }
 }
 
 export function captureAcquisitionFromUrl(): AcquisitionParams | null {
@@ -26,6 +53,7 @@ export function captureAcquisitionFromUrl(): AcquisitionParams | null {
     'gclid',
     'fbclid',
     'ttclid',
+    'msclkid',
   ];
 
   let hasParams = false;
@@ -37,6 +65,13 @@ export function captureAcquisitionFromUrl(): AcquisitionParams | null {
     }
   });
 
+  // Always capture landing page info and referrer
+  acq.landing_path = window.location.pathname;
+  acq.landing_url = window.location.href;
+  acq.referrer = document.referrer || '';
+  acq.captured_at = new Date().toISOString();
+  acq.attribution_id = getOrCreateAttributionId();
+
   if (hasParams) {
     try {
       localStorage.setItem(ACQ_KEY, JSON.stringify(acq));
@@ -46,7 +81,7 @@ export function captureAcquisitionFromUrl(): AcquisitionParams | null {
     }
   }
 
-  return null;
+  return acq;
 }
 
 export function getAcquisitionParams(): AcquisitionParams | null {

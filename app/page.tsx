@@ -11,6 +11,7 @@ import {
   appendAcqParams,
 } from '@/lib/acquisition';
 import { track } from '@/lib/track';
+import { trackUTMToSupabase } from '@/lib/utm-tracking';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageToggle } from '@/components/LanguageToggle';
 
@@ -26,9 +27,26 @@ export default function Home() {
 
   useEffect(() => {
     console.log('[FunnelA] 🚀 Page loaded');
-    captureAcquisitionFromUrl();
-    const acq = getAcquisitionParams();
+    
+    // Capture UTM parameters and tracking data
+    const acq = captureAcquisitionFromUrl();
     console.log('[FunnelA] 📊 Acquisition params:', acq);
+    
+    // Track to Supabase (first-touch attribution)
+    if (acq) {
+      trackUTMToSupabase(acq).then((tracked) => {
+        if (tracked) {
+          console.log('[FunnelA] UTM data tracked to Supabase');
+        } else {
+          console.log('[FunnelA] UTM tracking skipped (already tracked or no params)');
+        }
+      }).catch((error) => {
+        console.error('[FunnelA] Failed to track UTM to Supabase:', error);
+      });
+    }
+    
+    // Get stored acquisition params for PostHog
+    const storedAcq = getAcquisitionParams();
     
     // Wait for PostHog to be ready before tracking (max 3 seconds)
     let attempts = 0;
@@ -37,11 +55,11 @@ export default function Home() {
     const waitForPostHog = () => {
       attempts++;
       if ((window as any).posthog && ((window as any).posthog.__loaded || (window as any).posthog.get_distinct_id)) {
-        console.log('[FunnelA] ✅ PostHog ready, tracking page view');
+        console.log('[FunnelA] PostHog ready, tracking page view');
         track('FunnelA_PageView', {
           path: '/',
           variant: 'funnel_a',
-          ...acq,
+          ...storedAcq,
         });
       } else if (attempts < maxAttempts) {
         // Retry after 100ms if PostHog not ready
@@ -51,7 +69,7 @@ export default function Home() {
         track('FunnelA_PageView', {
           path: '/',
           variant: 'funnel_a',
-          ...acq,
+          ...storedAcq,
         });
       }
     };
