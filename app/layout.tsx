@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import { Suspense } from 'react';
 import { PostHogProvider } from '@/components/PostHogProvider';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -51,7 +52,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <Suspense fallback={null}>
           <PostHogProvider>
-            <LanguageProvider>{children}</LanguageProvider>
+            <LanguageProvider>
+              <ThemeProvider>{children}</ThemeProvider>
+            </LanguageProvider>
           </PostHogProvider>
         </Suspense>
       </body>

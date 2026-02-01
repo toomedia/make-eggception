@@ -19,7 +19,7 @@ export function LanguageToggle() {
         <Button
           variant="ghost"
           size="sm"
-          className="fixed top-4 right-4 z-50 h-9 px-3 text-white hover:bg-white/10 hover:text-white bg-black/50 backdrop-blur-md border border-white/30"
+          className="h-9 px-3 text-foreground hover:bg-accent bg-background/80 backdrop-blur-md border border-border"
         >
           <Languages className="h-4 w-4 mr-2" />
           <span className="uppercase font-medium">{language}</span>

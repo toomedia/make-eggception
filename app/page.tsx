@@ -13,7 +13,9 @@ import {
 import { track } from '@/lib/track';
 import { trackUTMToSupabase } from '@/lib/utm-tracking';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { LanguageToggle } from '@/components/LanguageToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const EXTERNAL_URLS = {
   home: 'https://www.eggception.club/',
@@ -24,6 +26,7 @@ const EXTERNAL_URLS = {
 
 export default function Home() {
   const { t } = useLanguage();
+  const { theme } = useTheme();
 
   useEffect(() => {
     console.log('[FunnelA] 🚀 Page loaded');
@@ -100,9 +103,12 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      <LanguageToggle />
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+    <div className="min-h-screen bg-background transition-colors duration-300">
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
+        <LanguageToggle />
+        <ThemeToggle />
+      </div>
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 dark">
         <div className="absolute inset-0 z-0">
           <Image
             src="/funal_a.png"
@@ -158,14 +164,14 @@ export default function Home() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 px-4">
-            <div className="px-5 py-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/30">
-              <span className="text-sm font-medium text-white">{t('hero.badge1')}</span>
+            <div className="px-5 py-2.5 rounded-full bg-black/50 dark:bg-black/50 backdrop-blur-md border border-white/30 dark:border-white/30">
+              <span className="text-sm font-medium text-white dark:text-white">{t('hero.badge1')}</span>
             </div>
-            <div className="px-5 py-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/30">
-              <span className="text-sm font-medium text-white">{t('hero.badge2')}</span>
+            <div className="px-5 py-2.5 rounded-full bg-black/50 dark:bg-black/50 backdrop-blur-md border border-white/30 dark:border-white/30">
+              <span className="text-sm font-medium text-white dark:text-white">{t('hero.badge2')}</span>
             </div>
-            <div className="px-5 py-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/30">
-              <span className="text-sm font-medium text-white">{t('hero.badge3')}</span>
+            <div className="px-5 py-2.5 rounded-full bg-black/50 dark:bg-black/50 backdrop-blur-md border border-white/30 dark:border-white/30">
+              <span className="text-sm font-medium text-white dark:text-white">{t('hero.badge3')}</span>
             </div>
           </div>
         </div>
