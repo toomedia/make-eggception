@@ -111,7 +111,7 @@ export default function Home() {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 dark">
         <div className="absolute inset-0 z-0">
           <Image
-            src={theme === 'dark' ? '/funal_a.png' : '/image.png'}
+            src={theme === 'dark' ? '/funal_a.png' : '/banner.png'}
             alt="Eggception Hero"
             fill
             priority
@@ -122,10 +122,11 @@ export default function Home() {
             }}
           />
           {theme === 'dark' && <div className="absolute inset-0 bg-black/60" />}
+          {theme === 'light' && <div className="absolute inset-0 bg-black/30" />}
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl sm:text-5xl md:text-6xl lg:text-7xl font-black  mb-8 leading-[1.1] tracking-tight">
+          <h1 className={`text-5xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-8 leading-[1.1] tracking-tight ${theme === 'light' ? 'text-white' : ''}`}>
 
             {t('hero.title').split('your style').length > 1 ? (
               <>Like Memory, but in <span className="relative inline-block"><span className="absolute inset-0 bg-blue-500/20 -skew-x-12 rounded"></span><span className="relative text-orange-400">your</span></span> style.</>
@@ -134,13 +135,13 @@ export default function Home() {
             )}
           </h1>
 
-          <p className="text-xl sm:text-xl md:text-2xl font-black mb-8 max-w-3xl mx-auto leading-relaxed font-medium">
+          <p className={`text-xl sm:text-xl md:text-2xl font-black mb-8 max-w-3xl mx-auto leading-relaxed font-medium ${theme === 'light' ? 'text-white' : ''}`}>
             {t('hero.subtitle')}
             <br />
             {t('hero.description')}
           </p>
 
-          <p className="text-sm font-black font-black mb-12 max-w-2xl mx-auto">
+          <p className={`text-sm font-black font-black mb-12 max-w-2xl mx-auto ${theme === 'light' ? 'text-white' : ''}`}>
             {t('hero.eggExplanation')}
           </p>
 
@@ -152,7 +153,7 @@ export default function Home() {
               {t('hero.createEgg')}
             </PrimaryButton>
 
-            <p className="text-sm font-black text-gray-900 dark:text-white">
+            <p className={`text-sm font-black ${theme === 'light' ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
               {t('hero.freeStart')}
             </p>
 
@@ -166,13 +167,13 @@ export default function Home() {
 
           <div className="flex flex-wrap items-center justify-center gap-3 px-4">
             <div className="px-5 py-2.5 rounded-full bg-black/50 dark:bg-black/50 backdrop-blur-md border border-white/30 dark:border-white/30">
-              <span className="text-sm font-black text-gray-900 dark:text-white">{t('hero.badge1')}</span>
+              <span className={`text-sm font-black ${theme === 'light' ? 'text-white' : 'text-gray-900 dark:text-white'}`}>{t('hero.badge1')}</span>
             </div>
             <div className="px-5 py-2.5 rounded-full bg-black/50 dark:bg-black/50 backdrop-blur-md border border-white/30 dark:border-white/30">
-              <span className="text-sm font-black text-gray-900 dark:text-white">{t('hero.badge2')}</span>
+              <span className={`text-sm font-black ${theme === 'light' ? 'text-white' : 'text-gray-900 dark:text-white'}`}>{t('hero.badge2')}</span>
             </div>
             <div className="px-5 py-2.5 rounded-full bg-black/50 dark:bg-black/50 backdrop-blur-md border border-white/30 dark:border-white/30">
-              <span className="text-sm font-black text-gray-900 dark:text-white">{t('hero.badge3')}</span>
+              <span className={`text-sm font-black ${theme === 'light' ? 'text-white' : 'text-gray-900 dark:text-white'}`}>{t('hero.badge3')}</span>
             </div>
           </div>
         </div>
