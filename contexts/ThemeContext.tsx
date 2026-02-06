@@ -90,6 +90,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     toggleTheme,
   };
 
+  // ✅ prevent flash of incorrect theme
+  if (!mounted) return null;
+
   return (
     <ThemeContext.Provider value={value}>
       {children}
