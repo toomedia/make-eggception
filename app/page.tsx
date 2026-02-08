@@ -131,7 +131,7 @@ export default function Home() {
             {t('hero.title').split('your style').length > 1 ? (
               <>Like Memory, but in <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] to-[#F7931E] font-black animate-pulse [animation-duration:3s]">your</span> style.</>
             ) : (
-              <>Wie Memory, nur in <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] to-[#F7931E] font-black animate-pulse [animation-duration:3s]">dei</span>nem Style.</>
+              <>Wie Memory, nur in d<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] to-[#F7931E] font-black animate-pulse [animation-duration:3s]">ei</span>nem Style.</>
             )}
           </h1>
 
