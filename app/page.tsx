@@ -129,9 +129,9 @@ export default function Home() {
           <h1 className={`text-5xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-8 leading-[1.1] tracking-tight ${theme === 'light' ? 'text-white' : ''}`}>
 
             {t('hero.title').split('your style').length > 1 ? (
-              <>Like Memory, but in <span className="relative inline-block"><span className="absolute inset-0 bg-blue-500/20 -skew-x-12 rounded"></span><span className="relative text-orange-400">your</span></span> style.</>
+              <>Like Memory, but in <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] to-[#F7931E] font-black animate-pulse [animation-duration:3s]">your</span> style.</>
             ) : (
-              <>Wie Memory, nur in d<span className="relative inline-block"><span className="absolute inset-0 bg-blue-500/20 -skew-x-12 rounded"></span><span className="relative text-orange-400">ei</span></span>nem Style.</>
+              <>Wie Memory, nur in <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] to-[#F7931E] font-black animate-pulse [animation-duration:3s]">dei</span>nem Style.</>
             )}
           </h1>
 
