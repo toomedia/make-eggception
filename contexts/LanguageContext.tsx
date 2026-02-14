@@ -98,6 +98,10 @@ export function useLanguage() {
 
 const translations = {
   en: {
+    nav: {
+      games: 'Games',
+      presets: 'Presets',
+    },
     hero: {
       title: 'Like Memory, but in your style.',
       subtitle: 'Short matches. Your own cards.',
@@ -151,6 +155,10 @@ const translations = {
     },
   },
   de: {
+    nav: {
+      games: 'Spiele',
+      presets: 'Presets',
+    },
     hero: {
       title: 'Wie Memory, nur in deinem Style.',
       subtitle: 'Kurze Matches. Deine eigenen Karten.',
