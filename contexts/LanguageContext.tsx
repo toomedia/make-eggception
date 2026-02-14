@@ -150,8 +150,8 @@ const translations = {
       createEgg: 'Create Egg',
       viewDecks: 'View Ready Decks',
     },
-    footer: {
-      copyright: 'All rights reserved.',
+     footer: {
+      copyright: '© 2026 Eggception. Memory meets Battle.',
     },
   },
   de: {
@@ -208,7 +208,7 @@ const translations = {
       viewDecks: 'Fertige Decks ansehen',
     },
     footer: {
-      copyright: 'Alle Rechte vorbehalten.',
+        copyright: '© 2026 Eggception. Memory meets Battle.',
     },
   },
 };

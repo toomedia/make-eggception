@@ -358,9 +358,9 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="py-8 px-6 border-t border-gray-400">
+   <footer className="py-8 px-6 border-t border-[var(--border-color)]">
         <div className="max-w-6xl mx-auto text-center text-[var(--text-muted)] text-sm">
-          <p>© {new Date().getFullYear()} Eggception. {t('footer.copyright')}</p>
+          {t('footer.copyright')}
         </div>
       </footer>
     </div>
