@@ -151,7 +151,7 @@ const translations = {
       viewDecks: 'View Ready Decks',
     },
      footer: {
-      copyright: '© 2026 Eggception. Memory meets Battle.',
+      copyright: '© 2026 Eggception. All rights reserved.',
     },
   },
   de: {
@@ -208,7 +208,7 @@ const translations = {
       viewDecks: 'Fertige Decks ansehen',
     },
     footer: {
-        copyright: '© 2026 Eggception. Memory meets Battle.',
+        copyright: '© 2026 Eggception. Alle Rechte vorbehalten.',
     },
   },
 };
