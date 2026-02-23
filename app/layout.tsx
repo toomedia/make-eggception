@@ -2,7 +2,9 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Suspense } from 'react';
-import { PostHogProvider } from '@/components/PostHogProvider';
+import { AnalyticsBootstrap } from '@/components/AnalyticsBootstrap';
+import ConsentBanner from '@/components/ConsentBanner';
+import { ConsentProvider } from '@/components/ConsentContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
@@ -51,11 +53,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Suspense fallback={null}>
-          <PostHogProvider>
-            <LanguageProvider>
-              <ThemeProvider>{children}</ThemeProvider>
-            </LanguageProvider>
-          </PostHogProvider>
+          <AnalyticsBootstrap app="make" variant="funnel_a" />
+          <LanguageProvider>
+            <ThemeProvider>
+              <ConsentProvider>
+                <ConsentBanner />
+                {children}
+              </ConsentProvider>
+            </ThemeProvider>
+          </LanguageProvider>
         </Suspense>
       </body>
     </html>
