@@ -13,7 +13,15 @@ export type ConsentCookieValue = {
   analytics: boolean;
   marketing: boolean;
   source: string;
-  ts: number;
+  ts: string; // ISO string
+};
+
+type ConsentCookieValueRaw = {
+  v?: unknown;
+  analytics?: unknown;
+  marketing?: unknown;
+  source?: unknown;
+  ts?: unknown;
 };
 
 function readCookie(name: string): string | undefined {
@@ -31,38 +39,57 @@ function safeJsonParse(value: string | undefined): any | undefined {
   }
 }
 
-function safeParseConsentCookieValue(raw: string | undefined): ConsentCookieValue | undefined {
+function safeParseConsentCookieValue(raw: string | undefined): ConsentCookieValueRaw | undefined {
   if (!raw) return undefined;
 
   const direct = safeJsonParse(raw);
-  if (direct) return direct as ConsentCookieValue;
+  if (direct) return direct as ConsentCookieValueRaw;
 
   try {
     const decoded = decodeURIComponent(raw);
     const parsed = safeJsonParse(decoded);
-    return parsed as ConsentCookieValue | undefined;
+    return parsed as ConsentCookieValueRaw | undefined;
   } catch {
     return undefined;
   }
 }
 
+function normalizeConsentCookieValue(raw: ConsentCookieValueRaw | undefined): ConsentCookieValue | null {
+  if (!raw) return null;
+  if (raw.v !== 1) return null;
+  if (typeof raw.analytics !== 'boolean' || typeof raw.marketing !== 'boolean') return null;
+
+  const source = typeof raw.source === 'string' ? raw.source : 'unknown';
+  let ts: string | null = null;
+  if (typeof raw.ts === 'number') {
+    ts = new Date(raw.ts).toISOString();
+  } else if (typeof raw.ts === 'string') {
+    ts = raw.ts;
+  }
+  if (!ts) return null;
+
+  return {
+    v: 1,
+    analytics: raw.analytics,
+    marketing: raw.marketing,
+    source,
+    ts,
+  };
+}
+
 function consentFromEggCookie(): ConsentState | undefined {
   const raw = readCookie(EGG_CONSENT_COOKIE);
-  const parsed = safeParseConsentCookieValue(raw);
-  if (!parsed || parsed.v !== 1) return undefined;
-  if (typeof parsed.analytics !== 'boolean' || typeof parsed.marketing !== 'boolean') return undefined;
-  if (typeof parsed.source !== 'string' || typeof parsed.ts !== 'number') return undefined;
+  const parsed = normalizeConsentCookieValue(safeParseConsentCookieValue(raw));
+  if (!parsed) return undefined;
   const status: ConsentState['status'] =
     parsed.analytics || parsed.marketing ? 'granted' : 'denied';
-  return { analytics: parsed.analytics, marketing: parsed.marketing, source: parsed.source || 'egg_cookie', status };
+  return { analytics: parsed.analytics, marketing: parsed.marketing, source: parsed.source, status };
 }
 
 export function readConsentCookieValue(): ConsentCookieValue | null {
   const raw = readCookie(EGG_CONSENT_COOKIE);
-  const parsed = safeParseConsentCookieValue(raw);
-  if (!parsed || parsed.v !== 1) return null;
-  if (typeof parsed.analytics !== 'boolean' || typeof parsed.marketing !== 'boolean') return null;
-  if (typeof parsed.source !== 'string' || typeof parsed.ts !== 'number') return null;
+  const parsed = normalizeConsentCookieValue(safeParseConsentCookieValue(raw));
+  if (!parsed) return null;
   return parsed;
 }
 
@@ -135,7 +162,7 @@ export function persistConsent(options: { analytics: boolean; marketing: boolean
     analytics: options.analytics,
     marketing: options.marketing,
     source: options.source,
-    ts: Date.now(),
+    ts: new Date().toISOString(),
   };
   const encoded = encodeURIComponent(JSON.stringify(value));
   const parts = [

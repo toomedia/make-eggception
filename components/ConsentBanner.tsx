@@ -15,14 +15,14 @@ const ConsentBanner = () => {
   }, [consent]);
 
   const handleAccept = async () => {
-    setConsent({ v: 1, analytics: true, marketing: false, source: 'funnel_banner', ts: Date.now() });
+    setConsent({ v: 1, analytics: true, marketing: false, source: 'funnel_banner', ts: new Date().toISOString() });
     setIsVisible(false);
     await initializePostHog();
     await trackPostHogEvent("cookie_consent_accepted", { source: "banner" });
   };
 
   const handleDecline = () => {
-    setConsent({ v: 1, analytics: false, marketing: false, source: 'funnel_banner', ts: Date.now() });
+    setConsent({ v: 1, analytics: false, marketing: false, source: 'funnel_banner', ts: new Date().toISOString() });
     setIsVisible(false);
   };
 

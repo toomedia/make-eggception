@@ -55,7 +55,7 @@ export function ConsentProvider(props: { children: React.ReactNode }) {
       analytics: Boolean(next.analytics),
       marketing: Boolean(next.marketing),
       source: next.source || 'funnel_banner',
-      ts: Date.now(),
+      ts: new Date().toISOString(),
     };
 
     setConsentState(normalized);
