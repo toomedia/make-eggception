@@ -6,6 +6,15 @@ export type ConsentState = {
 };
 
 export const EGG_CONSENT_COOKIE = 'egg_consent_v1';
+export const EGG_CONSENT_COOKIE_MAX_AGE_SECONDS = 15_552_000; // 180 days
+
+export type ConsentCookieValue = {
+  v: 1;
+  analytics: boolean;
+  marketing: boolean;
+  source: string;
+  ts: number;
+};
 
 function readCookie(name: string): string | undefined {
   if (typeof document === 'undefined') return undefined;
@@ -22,16 +31,39 @@ function safeJsonParse(value: string | undefined): any | undefined {
   }
 }
 
-type StoredConsent = { v: 1; analytics: boolean; marketing: boolean; updated_at: string };
+function safeParseConsentCookieValue(raw: string | undefined): ConsentCookieValue | undefined {
+  if (!raw) return undefined;
+
+  const direct = safeJsonParse(raw);
+  if (direct) return direct as ConsentCookieValue;
+
+  try {
+    const decoded = decodeURIComponent(raw);
+    const parsed = safeJsonParse(decoded);
+    return parsed as ConsentCookieValue | undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 function consentFromEggCookie(): ConsentState | undefined {
   const raw = readCookie(EGG_CONSENT_COOKIE);
-  const parsed = safeJsonParse(raw) as StoredConsent | undefined;
+  const parsed = safeParseConsentCookieValue(raw);
   if (!parsed || parsed.v !== 1) return undefined;
   if (typeof parsed.analytics !== 'boolean' || typeof parsed.marketing !== 'boolean') return undefined;
+  if (typeof parsed.source !== 'string' || typeof parsed.ts !== 'number') return undefined;
   const status: ConsentState['status'] =
     parsed.analytics || parsed.marketing ? 'granted' : 'denied';
-  return { analytics: parsed.analytics, marketing: parsed.marketing, source: 'egg_cookie', status };
+  return { analytics: parsed.analytics, marketing: parsed.marketing, source: parsed.source || 'egg_cookie', status };
+}
+
+export function readConsentCookieValue(): ConsentCookieValue | null {
+  const raw = readCookie(EGG_CONSENT_COOKIE);
+  const parsed = safeParseConsentCookieValue(raw);
+  if (!parsed || parsed.v !== 1) return null;
+  if (typeof parsed.analytics !== 'boolean' || typeof parsed.marketing !== 'boolean') return null;
+  if (typeof parsed.source !== 'string' || typeof parsed.ts !== 'number') return null;
+  return parsed;
 }
 
 function consentFromCookiebot(): ConsentState | undefined {
@@ -69,11 +101,13 @@ function consentFromLocalDebug(): ConsentState | undefined {
   const raw = window.localStorage?.getItem('egg_consent_v1');
   const parsed = safeJsonParse(raw ?? undefined);
   if (!parsed || typeof parsed !== 'object') return undefined;
-  if (typeof parsed.analytics !== 'boolean' || typeof parsed.marketing !== 'boolean')
-    return undefined;
+  // Backwards-compat: old shape {analytics:boolean, marketing?:boolean}
+  const analytics = typeof (parsed as any).analytics === 'boolean' ? (parsed as any).analytics : undefined;
+  const marketing = typeof (parsed as any).marketing === 'boolean' ? (parsed as any).marketing : false;
+  if (typeof analytics !== 'boolean') return undefined;
   const status: ConsentState['status'] =
-    parsed.analytics || parsed.marketing ? 'granted' : 'denied';
-  return { analytics: parsed.analytics, marketing: parsed.marketing, source: 'debug', status };
+    analytics || marketing ? 'granted' : 'denied';
+  return { analytics, marketing, source: 'localStorage_legacy', status };
 }
 
 export function readConsent(): ConsentState {
@@ -94,51 +128,43 @@ export function readConsent(): ConsentState {
   );
 }
 
-function getDefaultCookieDomain(): string | undefined {
-  if (typeof window === 'undefined') return undefined;
-  const override = process.env.NEXT_PUBLIC_EGG_COOKIE_DOMAIN;
-  if (override) return override;
-  const host = window.location.hostname;
-  if (host === 'eggception.club' || host.endsWith('.eggception.club')) return '.eggception.club';
-  return undefined;
+export function persistConsent(options: { analytics: boolean; marketing: boolean; source: string }): void {
+  if (typeof document === 'undefined') return;
+  const value: ConsentCookieValue = {
+    v: 1,
+    analytics: options.analytics,
+    marketing: options.marketing,
+    source: options.source,
+    ts: Date.now(),
+  };
+  const encoded = encodeURIComponent(JSON.stringify(value));
+  const parts = [
+    `${EGG_CONSENT_COOKIE}=${encoded}`,
+    'Domain=.eggception.club',
+    'Path=/',
+    'SameSite=Lax',
+    'Secure',
+    `Max-Age=${EGG_CONSENT_COOKIE_MAX_AGE_SECONDS}`,
+  ];
+  document.cookie = parts.join('; ');
 }
 
 export function persistConsentIfAccepted(options: { analytics: boolean; marketing: boolean }): void {
   if (typeof document === 'undefined') return;
-  if (!options.analytics && !options.marketing) return;
-
-  const value: StoredConsent = { v: 1, analytics: options.analytics, marketing: options.marketing, updated_at: new Date().toISOString() };
-  const encoded = encodeURIComponent(JSON.stringify(value));
-  const maxAgeSeconds = 180 * 24 * 60 * 60;
-  const domain = getDefaultCookieDomain();
-  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:';
-
-  const parts = [
-    `${EGG_CONSENT_COOKIE}=${encoded}`,
-    `Path=/`,
-    `Max-Age=${maxAgeSeconds}`,
-    `SameSite=Lax`,
-    secure ? 'Secure' : '',
-    domain ? `Domain=${domain}` : '',
-  ].filter(Boolean);
-
-  document.cookie = parts.join('; ');
+  // Backwards-compatible alias: treat as funnel banner accept.
+  persistConsent({ ...options, source: 'funnel_banner' });
 }
 
 export function clearPersistedConsent(): void {
   if (typeof document === 'undefined') return;
-  const domain = getDefaultCookieDomain();
-  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:';
-
   const parts = [
     `${EGG_CONSENT_COOKIE}=`,
-    `Path=/`,
-    `Max-Age=0`,
-    `SameSite=Lax`,
-    secure ? 'Secure' : '',
-    domain ? `Domain=${domain}` : '',
-  ].filter(Boolean);
-
+    'Domain=.eggception.club',
+    'Path=/',
+    'SameSite=Lax',
+    'Secure',
+    'Max-Age=0',
+  ];
   document.cookie = parts.join('; ');
 }
 

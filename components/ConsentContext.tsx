@@ -1,13 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { clearPersistedConsent, persistConsentIfAccepted, readConsent } from '@/lib/egg-analytics/consent';
+import { persistConsent, readConsentCookieValue, type ConsentCookieValue, readConsent } from '@/lib/egg-analytics/consent';
 
-type ConsentValue = null | { analytics: boolean; updatedAt: number };
+type ConsentValue = null | ConsentCookieValue;
 
 type ConsentContextValue = {
   consent: ConsentValue;
-  setConsent: (next: { analytics: boolean; updatedAt: number }) => void;
+  setConsent: (next: ConsentCookieValue) => void;
 };
 
 const ConsentContext = createContext<ConsentContextValue | undefined>(undefined);
@@ -22,9 +22,9 @@ export function ConsentProvider(props: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // If user already accepted (cookie), treat as consent given.
-    if (initial.analytics || initial.marketing) {
-      setConsentState({ analytics: true, updatedAt: Date.now() });
+    const cookieValue = readConsentCookieValue();
+    if (cookieValue) {
+      setConsentState(cookieValue);
       return;
     }
 
@@ -33,29 +33,41 @@ export function ConsentProvider(props: { children: React.ReactNode }) {
       const raw = window.sessionStorage?.getItem(SESSION_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw) as ConsentValue;
-      if (parsed && typeof parsed === 'object' && typeof (parsed as any).analytics === 'boolean') {
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        (parsed as any).v === 1 &&
+        typeof (parsed as any).analytics === 'boolean' &&
+        typeof (parsed as any).marketing === 'boolean' &&
+        typeof (parsed as any).source === 'string' &&
+        typeof (parsed as any).ts === 'number'
+      ) {
         setConsentState(parsed);
       }
     } catch {
       // ignore
     }
-  }, [initial.analytics, initial.marketing]);
+  }, [initial.analytics, initial.marketing, initial.source, initial.status]);
 
-  const setConsent = (next: { analytics: boolean; updatedAt: number }) => {
-    setConsentState(next);
+  const setConsent = (next: ConsentCookieValue) => {
+    const normalized: ConsentCookieValue = {
+      v: 1,
+      analytics: Boolean(next.analytics),
+      marketing: Boolean(next.marketing),
+      source: next.source || 'funnel_banner',
+      ts: Date.now(),
+    };
+
+    setConsentState(normalized);
 
     try {
-      window.sessionStorage?.setItem(SESSION_KEY, JSON.stringify(next));
+      window.sessionStorage?.setItem(SESSION_KEY, JSON.stringify(normalized));
     } catch {
       // ignore
     }
 
-    if (next.analytics) {
-      persistConsentIfAccepted({ analytics: true, marketing: false });
-    } else {
-      // Decline should not persist a cross-site "deny", but should remove any prior accept.
-      clearPersistedConsent();
-    }
+    // Requirement: persist on accept OR decline (cross-subdomain cookie).
+    persistConsent({ analytics: normalized.analytics, marketing: normalized.marketing, source: normalized.source });
 
     window.dispatchEvent(new CustomEvent('egg:consent_update'));
   };
@@ -68,4 +80,3 @@ export function useConsent() {
   if (!ctx) throw new Error('useConsent must be used within ConsentProvider');
   return ctx;
 }
-
