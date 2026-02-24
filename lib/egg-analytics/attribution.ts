@@ -2,6 +2,7 @@ import type { AttributionFields } from './types';
 import { supabase } from '@/lib/supabase';
 
 export const ATTRIBUTION_STORAGE_KEY = 'egg_attribution_v1';
+export const ATTRIBUTION_TTL_DAYS = 90;
 
 type StoredAttribution = {
   v: 1;
@@ -11,6 +12,7 @@ type StoredAttribution = {
   first_seen_at: string;
   last_seen_at: string;
   first_touch_sent?: boolean;
+  stored_at?: string;
 };
 
 function nowIso(): string {
@@ -44,6 +46,17 @@ function safeReadStored(): StoredAttribution | undefined {
     const parsed = JSON.parse(raw) as StoredAttribution;
     if (!parsed || parsed.v !== 1) return undefined;
     if (typeof parsed.attribution_id !== 'string') return undefined;
+    const reference = parsed.stored_at || parsed.first_seen_at || parsed.last_seen_at;
+    if (reference) {
+      const ts = Date.parse(reference);
+      if (!Number.isNaN(ts)) {
+        const maxAgeMs = ATTRIBUTION_TTL_DAYS * 24 * 60 * 60 * 1000;
+        if (Date.now() - ts > maxAgeMs) {
+          window.localStorage?.removeItem(ATTRIBUTION_STORAGE_KEY);
+          return undefined;
+        }
+      }
+    }
     return parsed;
   } catch {
     return undefined;
@@ -53,7 +66,11 @@ function safeReadStored(): StoredAttribution | undefined {
 function safeWriteStored(value: StoredAttribution): void {
   if (typeof window === 'undefined') return;
   try {
-    window.localStorage?.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(value));
+    const next: StoredAttribution = {
+      ...value,
+      stored_at: value.stored_at || nowIso(),
+    };
+    window.localStorage?.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(next));
   } catch {
     // ignore
   }
@@ -99,6 +116,7 @@ export function captureAttributionFromWindow(options: { persist: boolean }): Sto
     first_seen_at: stored?.first_seen_at ?? timestamp,
     last_seen_at: timestamp,
     first_touch_sent: stored?.first_touch_sent,
+    stored_at: stored?.stored_at ?? timestamp,
   };
 
   if (options.persist) safeWriteStored(next);
@@ -152,11 +170,12 @@ export async function writeFirstTouchOnceIfAllowed(options: { persistAllowed: bo
   };
 
   try {
-    const { error } = await supabase.from('utm_tracking').insert([record]);
+    const { error } = await supabase
+      .from('utm_tracking')
+      .upsert([record], { onConflict: 'attribution_id', ignoreDuplicates: true });
     if (error) return;
     safeWriteStored({ ...stored, first_touch_sent: true, last_seen_at: nowIso() });
   } catch {
     // ignore
   }
 }
-
