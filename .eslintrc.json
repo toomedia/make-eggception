@@ -10,6 +10,7 @@
         "lib/egg-analytics/**/*.tsx",
         "components/AnalyticsBootstrap.tsx",
         "components/ConsentContext.tsx",
+        "components/MakeNavigation.tsx",
         "components/Navigation.tsx",
         "app/page.tsx"
       ],

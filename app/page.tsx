@@ -2,18 +2,13 @@
 
 import { Sparkles, Workflow, Zap } from 'lucide-react';
 import type { MouseEvent } from 'react';
-import MakeNavigation from '@/components/MakeNavigation';
 import { Card } from '@/components/ui/card';
-import { trackAndRedirect } from '@/lib/egg-analytics';
-import { appendAttributionToUrl } from '@/lib/egg-analytics/attribution';
+import { track, trackAndRedirect } from '@/lib/egg-analytics';
+import { appendAttributionToUrl, sanitizeDestination } from '@/lib/egg-analytics/attribution';
 import { EXTERNAL_URLS, type CtaId } from '@/lib/egg-analytics/ctas';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { PrimaryButton } from '@/components/ui/custom-buttons';
-
-function isModifiedClick(e: MouseEvent<HTMLAnchorElement>): boolean {
-  return e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0;
-}
 
 export default function Home() {
   const { t: tObj } = useLanguage();
@@ -31,14 +26,30 @@ export default function Home() {
     return typeof value === 'string' ? value : key;
   };
 
-  const redirect = (cta_id: CtaId, href: string, position: string) => {
-    trackAndRedirect({ cta_id, href, position, delayMs: 120 });
+  const handleOutboundClick = (
+    e: MouseEvent<HTMLAnchorElement>,
+    ctaId: CtaId,
+    destination: string,
+    position: string
+  ) => {
+    const isPlainLeftClick =
+      e.button === 0 &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.shiftKey &&
+      !e.altKey;
+
+    if (!isPlainLeftClick) {
+      track('cta_click', { cta_id: ctaId, destination: sanitizeDestination(destination), position } as any);
+      return;
+    }
+
+    e.preventDefault();
+    trackAndRedirect({ cta_id: ctaId, href: destination, position, delayMs: 120 });
   };
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
-      <MakeNavigation />
-
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
         <picture>
           <source media="(min-width: 1600px)" srcSet="/funal_a.png" />
@@ -92,18 +103,23 @@ export default function Home() {
           <div className="flex flex-col gap-5 items-center mb-10 sm:mb-12 w-full max-w-md mx-auto">
             <PrimaryButton
               type="button"
-              onClick={() => redirect('hero_studio', EXTERNAL_URLS.studio, 'FunnelA_EiGestalten_Click')}
+              onClick={() =>
+                trackAndRedirect({
+                  cta_id: 'hero_studio',
+                  href: EXTERNAL_URLS.studio,
+                  position: 'FunnelA_EiGestalten_Click',
+                  delayMs: 120,
+                })
+              }
               className="w-full sm:w-auto min-h-[40px] text-lg sm:text-xl font-bold shadow-2xl focus:ring-4 focus:ring-[var(--accent-primary)]/50 focus:outline-none transform hover:scale-105 transition-transform"
             >
               {t('hero.createEgg')}
             </PrimaryButton>
             <a
               href={appendAttributionToUrl(EXTERNAL_URLS.games)}
-              onClick={(e) => {
-                if (isModifiedClick(e)) return;
-                e.preventDefault();
-                redirect('hero_games', EXTERNAL_URLS.games, 'FunnelA_JetztSpielen_Click');
-              }}
+              onClick={(e) =>
+                handleOutboundClick(e, 'hero_games', EXTERNAL_URLS.games, 'FunnelA_JetztSpielen_Click')
+              }
               className={`${
                 theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-white hover:text-white'
               } underline underline-offset-4 transition-colors min-h-[48px] flex items-center focus:ring-2 focus:ring-white/50 focus:outline-none rounded px-2 text-lg font-semibold`}
@@ -241,18 +257,23 @@ export default function Home() {
           <div className="flex flex-col gap-4 items-center w-full max-w-md mx-auto">
             <button
               type="button"
-              onClick={() => redirect('steps_studio', EXTERNAL_URLS.studio, 'FunnelA_EiGestalten_Click')}
+              onClick={() =>
+                trackAndRedirect({
+                  cta_id: 'steps_studio',
+                  href: EXTERNAL_URLS.studio,
+                  position: 'FunnelA_EiGestalten_Click',
+                  delayMs: 120,
+                })
+              }
               className="btn-primary w-full sm:w-auto sm:min-w-[200px] min-h-[48px] focus:ring-4 focus:ring-[var(--accent-primary)]/50 focus:outline-none"
             >
               {t('howItWorks.createEgg')}
             </button>
             <a
               href={appendAttributionToUrl(EXTERNAL_URLS.presets)}
-              onClick={(e) => {
-                if (isModifiedClick(e)) return;
-                e.preventDefault();
-                redirect('steps_presets', EXTERNAL_URLS.presets, 'FunnelA_Presets_Click');
-              }}
+              onClick={(e) =>
+                handleOutboundClick(e, 'steps_presets', EXTERNAL_URLS.presets, 'FunnelA_Presets_Click')
+              }
               className="text-[var(--text-primary)] hover:text-[var(--accent-primary)] underline underline-offset-4 transition-colors min-h-[48px] flex items-center focus:ring-2 focus:ring-[var(--accent-primary)]/50 focus:outline-none rounded px-2"
             >
               {t('howItWorks.toPresets')}
@@ -281,7 +302,14 @@ export default function Home() {
               </p>
               <button
                 type="button"
-                onClick={() => redirect('card_studio', EXTERNAL_URLS.studio, 'FunnelA_EiGestalten_Click')}
+                onClick={() =>
+                  trackAndRedirect({
+                    cta_id: 'card_studio',
+                    href: EXTERNAL_URLS.studio,
+                    position: 'FunnelA_EiGestalten_Click',
+                    delayMs: 120,
+                  })
+                }
                 className="btn-primary w-full min-h-[48px] focus:ring-4 focus:ring-[var(--accent-primary)]/50 focus:outline-none"
               >
                 {t('features.click.cta')}
@@ -298,7 +326,14 @@ export default function Home() {
               </p>
               <button
                 type="button"
-                onClick={() => redirect('card_games', EXTERNAL_URLS.games, 'FunnelA_JetztSpielen_Click')}
+                onClick={() =>
+                  trackAndRedirect({
+                    cta_id: 'card_games',
+                    href: EXTERNAL_URLS.games,
+                    position: 'FunnelA_JetztSpielen_Click',
+                    delayMs: 120,
+                  })
+                }
                 className="btn-secondary w-full min-h-[48px] focus:ring-4 focus:ring-[var(--accent-primary)]/50 focus:outline-none"
               >
                 {t('features.match.cta')}
@@ -315,7 +350,14 @@ export default function Home() {
               </p>
               <button
                 type="button"
-                onClick={() => redirect('card_presets', EXTERNAL_URLS.presets, 'FunnelA_FertigeDecks_Click')}
+                onClick={() =>
+                  trackAndRedirect({
+                    cta_id: 'card_presets',
+                    href: EXTERNAL_URLS.presets,
+                    position: 'FunnelA_FertigeDecks_Click',
+                    delayMs: 120,
+                  })
+                }
                 className="btn-secondary w-full min-h-[48px] focus:ring-4 focus:ring-[var(--accent-primary)]/50 focus:outline-none"
               >
                 {t('features.battle.cta')}
@@ -337,18 +379,23 @@ export default function Home() {
           <div className="flex flex-col gap-4 items-center w-full max-w-md mx-auto">
             <button
               type="button"
-              onClick={() => redirect('final_studio', EXTERNAL_URLS.studio, 'FunnelA_EiGestalten_Click')}
+              onClick={() =>
+                trackAndRedirect({
+                  cta_id: 'final_studio',
+                  href: EXTERNAL_URLS.studio,
+                  position: 'FunnelA_EiGestalten_Click',
+                  delayMs: 120,
+                })
+              }
               className="btn-primary w-full sm:w-auto sm:min-w-[200px] min-h-[48px] focus:ring-4 focus:ring-[var(--accent-primary)]/50 focus:outline-none"
             >
               {t('final.createEgg')}
             </button>
             <a
               href={appendAttributionToUrl(EXTERNAL_URLS.presets)}
-              onClick={(e) => {
-                if (isModifiedClick(e)) return;
-                e.preventDefault();
-                redirect('final_presets', EXTERNAL_URLS.presets, 'FunnelA_FertigeDecks_Click');
-              }}
+              onClick={(e) =>
+                handleOutboundClick(e, 'final_presets', EXTERNAL_URLS.presets, 'FunnelA_FertigeDecks_Click')
+              }
               className="text-[var(--text-primary)] hover:text-[var(--accent-primary)] underline underline-offset-4 transition-colors min-h-[48px] flex items-center focus:ring-2 focus:ring-[var(--accent-primary)]/50 focus:outline-none rounded px-2"
             >
               {t('final.viewDecks')}

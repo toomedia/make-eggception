@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import useTranslation from '@/lib/useTranslation';
+import { useLanguage } from '@/lib/LanguageContext';
 import { useConsent } from '@/components/ConsentContext';
 
 const ConsentBanner = () => {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const { consent, setConsent } = useConsent();
 

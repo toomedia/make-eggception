@@ -1,19 +1,43 @@
 'use client';
 
 import React from 'react';
-import { trackAndRedirect } from '@/lib/egg-analytics';
-import { appendAttributionToUrl } from '@/lib/egg-analytics/attribution';
-import { EXTERNAL_URLS } from '@/lib/egg-analytics/ctas';
+import { track, trackAndRedirect } from '@/lib/egg-analytics';
+import { appendAttributionToUrl, sanitizeDestination } from '@/lib/egg-analytics/attribution';
+import { EXTERNAL_URLS, type CtaId } from '@/lib/egg-analytics/ctas';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useTheme } from '@/lib/ThemeContext';
-
-function isModifiedClick(e: React.MouseEvent<HTMLAnchorElement>): boolean {
-  return e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0;
-}
 
 export default function MakeNavigation() {
   const { language, setLanguage } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+
+  const handleOutboundClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    ctaId: CtaId,
+    destination: string
+  ) => {
+    const isPlainLeftClick =
+      e.button === 0 &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.shiftKey &&
+      !e.altKey;
+
+    if (!isPlainLeftClick) {
+      track(
+        'cta_click',
+        {
+          cta_id: ctaId,
+          destination: sanitizeDestination(destination),
+          position: 'nav',
+        } as any
+      );
+      return;
+    }
+
+    e.preventDefault();
+    trackAndRedirect({ cta_id: ctaId, href: destination, position: 'nav', delayMs: 120 });
+  };
 
   const toggleLanguage = () => {
     const newLang = language === 'de' ? 'en' : 'de';
@@ -35,11 +59,7 @@ export default function MakeNavigation() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <a
           href={appendAttributionToUrl(EXTERNAL_URLS.home)}
-          onClick={(e) => {
-            if (isModifiedClick(e)) return;
-            e.preventDefault();
-            trackAndRedirect({ cta_id: 'nav_home', href: EXTERNAL_URLS.home, position: 'nav', delayMs: 120 });
-          }}
+          onClick={(e) => handleOutboundClick(e, 'nav_logo', EXTERNAL_URLS.home)}
           className={`text-2xl font-bold hover:text-[var(--accent-primary)] transition-colors ${
             theme === 'dark' ? 'text-white' : 'text-[var(--text-primary)]'
           }`}
