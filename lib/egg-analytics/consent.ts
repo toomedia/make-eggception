@@ -106,7 +106,6 @@ function consentFromCookiebot(): ConsentState | undefined {
 function consentFromOneTrust(): ConsentState | undefined {
   const groups = (globalThis as any).OnetrustActiveGroups as string | undefined;
   if (groups) {
-    // Heuristic: treat any active group beyond strictly-necessary as granted.
     const normalized = groups.split(',').map((g) => g.trim()).filter(Boolean);
     const hasNonEssential = normalized.length > 0;
     return {
@@ -119,7 +118,6 @@ function consentFromOneTrust(): ConsentState | undefined {
 
   const optanon = readCookie('OptanonConsent');
   if (!optanon) return undefined;
-  // OptanonConsent is not reliably parseable without vendor config.
   return { analytics: false, marketing: false, source: 'onetrust', status: 'unknown' };
 }
 
@@ -128,7 +126,6 @@ function consentFromLocalDebug(): ConsentState | undefined {
   const raw = window.localStorage?.getItem('egg_consent_v1');
   const parsed = safeJsonParse(raw ?? undefined);
   if (!parsed || typeof parsed !== 'object') return undefined;
-  // Backwards-compat: old shape {analytics:boolean, marketing?:boolean}
   const analytics = typeof (parsed as any).analytics === 'boolean' ? (parsed as any).analytics : undefined;
   const marketing = typeof (parsed as any).marketing === 'boolean' ? (parsed as any).marketing : false;
   if (typeof analytics !== 'boolean') return undefined;
@@ -178,7 +175,6 @@ export function persistConsent(options: { analytics: boolean; marketing: boolean
 
 export function persistConsentIfAccepted(options: { analytics: boolean; marketing: boolean }): void {
   if (typeof document === 'undefined') return;
-  // Backwards-compatible alias: treat as funnel banner accept.
   persistConsent({ ...options, source: 'funnel_banner' });
 }
 
@@ -200,15 +196,12 @@ export function onConsentChange(callback: (next: ConsentState) => void): () => v
 
   const handler = () => callback(readConsent());
 
-  // Cookiebot
   window.addEventListener('CookiebotOnAccept', handler as any);
   window.addEventListener('CookiebotOnDecline', handler as any);
   window.addEventListener('CookiebotOnLoad', handler as any);
 
-  // OneTrust
   window.addEventListener('OneTrustGroupsUpdated', handler as any);
 
-  // Custom app event for local/manual QA: window.dispatchEvent(new CustomEvent('egg:consent_update'))
   window.addEventListener('egg:consent_update', handler as any);
 
   return () => {

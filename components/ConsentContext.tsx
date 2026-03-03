@@ -28,22 +28,29 @@ export function ConsentProvider(props: { children: React.ReactNode }) {
       return;
     }
 
-    // Otherwise, restore in-session decision (so we don't keep showing banner on every reload in the funnel).
     try {
       const raw = window.sessionStorage?.getItem(SESSION_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw) as ConsentValue;
-      if (
-        parsed &&
-        typeof parsed === 'object' &&
-        (parsed as any).v === 1 &&
-        typeof (parsed as any).analytics === 'boolean' &&
-        typeof (parsed as any).marketing === 'boolean' &&
-        typeof (parsed as any).source === 'string' &&
-        typeof (parsed as any).ts === 'number'
-      ) {
-        setConsentState(parsed);
-      }
+      if (!parsed || typeof parsed !== 'object' || (parsed as any).v !== 1) return;
+      if (typeof (parsed as any).analytics !== 'boolean' || typeof (parsed as any).marketing !== 'boolean') return;
+      if (typeof (parsed as any).source !== 'string') return;
+      const rawTs = (parsed as any).ts;
+      const ts =
+        typeof rawTs === 'string'
+          ? rawTs
+          : typeof rawTs === 'number'
+            ? new Date(rawTs).toISOString()
+            : null;
+      if (!ts) return;
+
+      setConsentState({
+        v: 1,
+        analytics: (parsed as any).analytics,
+        marketing: (parsed as any).marketing,
+        source: (parsed as any).source,
+        ts,
+      });
     } catch {
       // ignore
     }
@@ -66,7 +73,6 @@ export function ConsentProvider(props: { children: React.ReactNode }) {
       // ignore
     }
 
-    // Requirement: persist on accept OR decline (cross-subdomain cookie).
     persistConsent({ analytics: normalized.analytics, marketing: normalized.marketing, source: normalized.source });
 
     window.dispatchEvent(new CustomEvent('egg:consent_update'));

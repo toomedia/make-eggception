@@ -7,8 +7,8 @@ import { Card } from '@/components/ui/card';
 import { trackAndRedirect } from '@/lib/egg-analytics';
 import { appendAttributionToUrl } from '@/lib/egg-analytics/attribution';
 import { EXTERNAL_URLS, type CtaId } from '@/lib/egg-analytics/ctas';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/lib/LanguageContext';
+import { useTheme } from '@/lib/ThemeContext';
 import { PrimaryButton } from '@/components/ui/custom-buttons';
 
 function isModifiedClick(e: MouseEvent<HTMLAnchorElement>): boolean {
@@ -16,8 +16,20 @@ function isModifiedClick(e: MouseEvent<HTMLAnchorElement>): boolean {
 }
 
 export default function Home() {
-  const { t } = useLanguage();
+  const { t: tObj } = useLanguage();
   const { theme } = useTheme();
+  const t = (key: string): string => {
+    const parts = key.split('.');
+    let value: any = tObj;
+    for (const part of parts) {
+      if (value && typeof value === 'object' && part in value) {
+        value = value[part];
+      } else {
+        return key;
+      }
+    }
+    return typeof value === 'string' ? value : key;
+  };
 
   const redirect = (cta_id: CtaId, href: string, position: string) => {
     trackAndRedirect({ cta_id, href, position, delayMs: 120 });
@@ -49,7 +61,7 @@ export default function Home() {
         />
 
         <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto pt-16">
-        <h1 className={`text-5xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-8 leading-[1.1] tracking-tight ${theme === 'light' ? 'text-white' : ''}`}>
+        <h1 className="text-5xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-8 leading-[1.1] tracking-tight text-white">
             {t('hero.title').split('your style').length > 1 ? (
               <>
                 Like Memory, but in{' '}

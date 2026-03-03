@@ -51,7 +51,8 @@
     --accent-primary-dark: hsl(var(--primary));
     --text-on-accent: hsl(var(--primary-foreground));
   }
-  .dark {
+  .dark,
+  [data-theme="dark"] {
     /* Dark mode variables */
     --background: 0 0% 7%;
     --foreground: 0 0% 98%;

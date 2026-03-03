@@ -1,6 +1,6 @@
 'use client';
 
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/lib/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 

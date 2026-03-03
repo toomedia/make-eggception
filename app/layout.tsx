@@ -1,31 +1,22 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { Suspense } from 'react';
-import { AnalyticsBootstrap } from '@/components/AnalyticsBootstrap';
-import ConsentBanner from '@/components/ConsentBanner';
-import { ConsentProvider } from '@/components/ConsentContext';
-import { LanguageProvider } from '@/contexts/LanguageContext';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-
-const inter = Inter({ subsets: ['latin'] });
-
-
+import ClientLayout from '@/components/ClientLayout';
+import { funnelConfig } from '@/lib/funnelConfig';
 
 export const metadata: Metadata = {
-  title: 'Eggception - Wie Memory, nur in deinem Style',
-  description: 'Kurze Matches. Deine eigenen Karten. Browser auf – Prompt rein – Ei raus. Dann Deck bauen & battlen.',
+  title: funnelConfig.metadata.title,
+  description: funnelConfig.metadata.description,
   openGraph: {
-    title: 'Eggception - Wie Memory, nur in deinem Style',
-    description: 'Kurze Matches. Deine eigenen Karten. Browser auf – Prompt rein – Ei raus. Dann Deck bauen & battlen.',
-    url: 'https://make-eggception.vercel.app',
+    title: funnelConfig.metadata.title,
+    description: funnelConfig.metadata.description,
+    url: funnelConfig.metadata.url,
     siteName: 'Eggception',
     images: [
       {
-        url: 'https://make-eggception.vercel.app/funal_a.png',
+        url: funnelConfig.metadata.imageUrl,
         width: 1200,
         height: 630,
-        alt: 'Eggception - Wie Memory, nur in deinem Style',
+        alt: funnelConfig.metadata.imageAlt,
       },
     ],
     locale: 'de_DE',
@@ -33,36 +24,22 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Eggception - Wie Memory, nur in deinem Style',
-    description: 'Kurze Matches. Deine eigenen Karten. Browser auf – Prompt rein – Ei raus. Dann Deck bauen & battlen.',
+    title: funnelConfig.metadata.title,
+    description: funnelConfig.metadata.description,
     images: [
       {
-        url: 'https://make-eggception.vercel.app/funal_a.png',
-        alt: 'Eggception - Wie Memory, nur in deinem Style',
+        url: funnelConfig.metadata.imageUrl,
+        alt: funnelConfig.metadata.imageAlt,
       },
     ],
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Suspense fallback={null}>
-          <AnalyticsBootstrap app="make" variant="funnel_a" />
-          <LanguageProvider>
-            <ThemeProvider>
-              <ConsentProvider>
-                <ConsentBanner />
-                {children}
-              </ConsentProvider>
-            </ThemeProvider>
-          </LanguageProvider>
-        </Suspense>
+    <html lang="de">
+      <body>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

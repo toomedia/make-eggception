@@ -19,7 +19,7 @@ let initializedCategories: { analytics: boolean; marketing: boolean } = { analyt
 function ensureContext(): TrackingContext {
   if (!context) {
     context = {
-      app: (process.env.NEXT_PUBLIC_EGG_APP as EggApp) || 'make',
+      app: (process.env.NEXT_PUBLIC_EGG_APP as EggApp) || 'unknown',
       variant: process.env.NEXT_PUBLIC_EGG_VARIANT || 'unknown',
     };
   }
@@ -42,8 +42,6 @@ function getProvidersForEvent(event: CanonicalEventName): AnalyticsProvider[] {
   const list: AnalyticsProvider[] = [];
   if (consent.analytics) list.push(...providers.filter((p) => p.category === 'analytics'));
   if (consent.marketing) list.push(...providers.filter((p) => p.category === 'marketing'));
-
-  // Marketing only receives CTA clicks in the FB adapter; analytics receives all.
   return list;
 }
 
@@ -88,17 +86,11 @@ export function track<E extends CanonicalEventName>(event: E, props?: Partial<Ev
   }
 }
 
-export function trackAndRedirect(options: {
-  cta_id: string;
-  href: string;
-  position?: string;
-  delayMs?: number;
-}): void {
+export function trackAndRedirect(options: { cta_id: string; href: string; position?: string; delayMs?: number }): void {
   if (typeof window === 'undefined') return;
 
   const destination = sanitizeDestination(options.href);
-  const delayMs =
-    consent.analytics || consent.marketing ? (options.delayMs ?? 120) : 0;
+  const delayMs = consent.analytics || consent.marketing ? (options.delayMs ?? 120) : 0;
 
   track('cta_click', {
     cta_id: options.cta_id,

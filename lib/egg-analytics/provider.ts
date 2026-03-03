@@ -1,11 +1,11 @@
 import type { CanonicalEventName, EventMap } from './types';
 
-export type ProviderCategory = 'analytics' | 'marketing';
+export type AnalyticsCategory = 'analytics' | 'marketing';
 
-export interface AnalyticsProvider {
+export type AnalyticsProvider = {
   name: string;
-  category: ProviderCategory;
-  init(): Promise<void> | void;
-  track<E extends CanonicalEventName>(event: E, props: EventMap[E]): void;
-}
+  category: AnalyticsCategory;
+  init: () => void | Promise<void>;
+  track: <E extends CanonicalEventName>(event: E, props: EventMap[E]) => void;
+};
 

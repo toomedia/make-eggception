@@ -1,7 +1,7 @@
 'use client';
 
 import { Languages } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/lib/LanguageContext';
 import { Button } from '@/components/ui/button';
 
 

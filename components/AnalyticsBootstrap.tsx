@@ -25,12 +25,10 @@ export function AnalyticsBootstrap(props: { app: EggApp; variant: string }) {
       const prev = lastConsentRef.current;
       const changed = !prev || prev.analytics !== next.analytics || prev.marketing !== next.marketing;
       lastConsentRef.current = next;
-      const prevAllowed = Boolean(prev?.analytics || prev?.marketing);
-      const nextAllowed = Boolean(next.analytics || next.marketing);
+      const wasAllowed = Boolean(prev?.analytics || prev?.marketing);
+      const isAllowed = Boolean(next.analytics || next.marketing);
 
-      // If the user is revoking consent, emit the consent_update event while we still have permission to send.
-      if (changed && prevAllowed && !nextAllowed) {
-        setConsent(prev!);
+      if (changed && wasAllowed) {
         track('consent_update', {
           analytics: next.analytics,
           marketing: next.marketing,
@@ -41,7 +39,7 @@ export function AnalyticsBootstrap(props: { app: EggApp; variant: string }) {
 
       setConsent(next);
 
-      const persistAllowed = next.analytics || next.marketing;
+      const persistAllowed = isAllowed;
       captureAttributionFromWindow({ persist: persistAllowed });
 
       await initAnalytics({ app: props.app, variant: props.variant, consent: next });
@@ -50,7 +48,7 @@ export function AnalyticsBootstrap(props: { app: EggApp; variant: string }) {
         await writeFirstTouchOnceIfAllowed({ persistAllowed: true });
       }
 
-      if (changed && (prevAllowed || nextAllowed)) {
+      if (changed && persistAllowed && !wasAllowed) {
         track('consent_update', {
           analytics: next.analytics,
           marketing: next.marketing,

@@ -2,7 +2,8 @@ import type { AttributionFields } from './types';
 import { supabase } from '@/lib/supabase';
 
 export const ATTRIBUTION_STORAGE_KEY = 'egg_attribution_v1';
-export const ATTRIBUTION_TTL_DAYS = 90;
+const ATTRIBUTION_TTL_DAYS = 90;
+const ATTRIBUTION_TTL_MS = ATTRIBUTION_TTL_DAYS * 24 * 60 * 60 * 1000;
 
 type StoredAttribution = {
   v: 1;
@@ -12,7 +13,6 @@ type StoredAttribution = {
   first_seen_at: string;
   last_seen_at: string;
   first_touch_sent?: boolean;
-  stored_at?: string;
 };
 
 function nowIso(): string {
@@ -46,16 +46,10 @@ function safeReadStored(): StoredAttribution | undefined {
     const parsed = JSON.parse(raw) as StoredAttribution;
     if (!parsed || parsed.v !== 1) return undefined;
     if (typeof parsed.attribution_id !== 'string') return undefined;
-    const reference = parsed.stored_at || parsed.first_seen_at || parsed.last_seen_at;
-    if (reference) {
-      const ts = Date.parse(reference);
-      if (!Number.isNaN(ts)) {
-        const maxAgeMs = ATTRIBUTION_TTL_DAYS * 24 * 60 * 60 * 1000;
-        if (Date.now() - ts > maxAgeMs) {
-          window.localStorage?.removeItem(ATTRIBUTION_STORAGE_KEY);
-          return undefined;
-        }
-      }
+    const lastSeen = Date.parse(parsed.last_seen_at || parsed.first_seen_at);
+    if (!Number.isFinite(lastSeen) || Date.now() - lastSeen > ATTRIBUTION_TTL_MS) {
+      window.localStorage?.removeItem(ATTRIBUTION_STORAGE_KEY);
+      return undefined;
     }
     return parsed;
   } catch {
@@ -66,11 +60,7 @@ function safeReadStored(): StoredAttribution | undefined {
 function safeWriteStored(value: StoredAttribution): void {
   if (typeof window === 'undefined') return;
   try {
-    const next: StoredAttribution = {
-      ...value,
-      stored_at: value.stored_at || nowIso(),
-    };
-    window.localStorage?.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(next));
+    window.localStorage?.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(value));
   } catch {
     // ignore
   }
@@ -116,10 +106,18 @@ export function captureAttributionFromWindow(options: { persist: boolean }): Sto
     first_seen_at: stored?.first_seen_at ?? timestamp,
     last_seen_at: timestamp,
     first_touch_sent: stored?.first_touch_sent,
-    stored_at: stored?.stored_at ?? timestamp,
   };
 
-  if (options.persist) safeWriteStored(next);
+  if (options.persist) {
+    safeWriteStored(next);
+    console.info('[Attribution] stored first-touch data', {
+      attribution_id: next.attribution_id,
+      utm: next.utm,
+      referrer: next.referrer,
+    });
+  } else {
+    console.info('[Attribution] capture skipped (persist=false)');
+  }
   return next;
 }
 
@@ -154,8 +152,14 @@ export async function writeFirstTouchOnceIfAllowed(options: { persistAllowed: bo
   if (typeof window === 'undefined') return;
 
   const stored = safeReadStored();
-  if (!stored) return;
-  if (stored.first_touch_sent) return;
+  if (!stored) {
+    console.info('[Attribution] no stored data; skip insert');
+    return;
+  }
+  if (stored.first_touch_sent) {
+    console.info('[Attribution] already sent; skip insert', { attribution_id: stored.attribution_id });
+    return;
+  }
 
   const record = {
     utm_source: stored.utm.utm_source,
@@ -172,10 +176,15 @@ export async function writeFirstTouchOnceIfAllowed(options: { persistAllowed: bo
   try {
     const { error } = await supabase
       .from('utm_tracking')
-      .upsert([record], { onConflict: 'attribution_id', ignoreDuplicates: true });
-    if (error) return;
+      .upsert(record, { onConflict: 'attribution_id', ignoreDuplicates: true });
+    if (error) {
+      console.warn('[Attribution] insert failed', { message: error.message });
+      return;
+    }
     safeWriteStored({ ...stored, first_touch_sent: true, last_seen_at: nowIso() });
+    console.info('[Attribution] insert ok', { attribution_id: stored.attribution_id });
   } catch {
     // ignore
+    console.warn('[Attribution] insert threw error');
   }
 }

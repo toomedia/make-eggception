@@ -4,8 +4,8 @@ import React from 'react';
 import { trackAndRedirect } from '@/lib/egg-analytics';
 import { appendAttributionToUrl } from '@/lib/egg-analytics/attribution';
 import { EXTERNAL_URLS } from '@/lib/egg-analytics/ctas';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/lib/LanguageContext';
+import { useTheme } from '@/lib/ThemeContext';
 
 function isModifiedClick(e: React.MouseEvent<HTMLAnchorElement>): boolean {
   return e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0;

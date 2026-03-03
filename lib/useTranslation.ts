@@ -1,4 +1,4 @@
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/lib/LanguageContext';
 
 type ConsentStrings = {
   title: string;

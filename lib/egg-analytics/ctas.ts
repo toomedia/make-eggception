@@ -6,6 +6,7 @@ export const EXTERNAL_URLS = {
 } as const;
 
 export const CTA_IDS = [
+  // make funnel
   'hero_studio',
   'hero_games',
   'steps_studio',
@@ -15,7 +16,20 @@ export const CTA_IDS = [
   'card_presets',
   'final_studio',
   'final_presets',
+
+  // play funnel
+  'nav_logo',
+  'nav_games',
+  'nav_presets',
+  'hero_play',
+  'hero_presets',
+  'card_play',
+  'card_presets',
+  'callout_games',
+  'steps_games',
+  'steps_presets',
+  'final_play',
+  'final_presets',
 ] as const;
 
 export type CtaId = (typeof CTA_IDS)[number];
-
