@@ -9,6 +9,8 @@ declare global {
   }
 }
 
+
+if (typeof window !== 'undefined') {
 window.forceWriteUtmToTable = async function() {
   const stored = safeReadStored();
   if (!stored) {
@@ -61,6 +63,7 @@ window.checkUtmInTable = async function() {
   } else {
   }
 };
+}
 
 export const ATTRIBUTION_STORAGE_KEY = 'egg_attribution_v1';
 const ATTRIBUTION_TTL_DAYS = 90;
