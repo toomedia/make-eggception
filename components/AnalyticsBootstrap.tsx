@@ -39,16 +39,14 @@ export function AnalyticsBootstrap(props: { app: EggApp; variant: string }) {
 
       setConsent(next);
 
-      const persistAllowed = isAllowed;
-      captureAttributionFromWindow({ persist: persistAllowed });
+      // Always persist UTM data to localStorage - consent only affects external analytics providers
+      captureAttributionFromWindow({ persist: true });
 
       await initAnalytics({ app: props.app, variant: props.variant, consent: next });
 
-      if (persistAllowed) {
-        await writeFirstTouchOnceIfAllowed({ persistAllowed: true });
-      }
+      await writeFirstTouchOnceIfAllowed({ persistAllowed: true });
 
-      if (changed && persistAllowed && !wasAllowed) {
+      if (changed && isAllowed && !wasAllowed) {
         track('consent_update', {
           analytics: next.analytics,
           marketing: next.marketing,
