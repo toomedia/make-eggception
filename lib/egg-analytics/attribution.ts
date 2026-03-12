@@ -1,6 +1,67 @@
 import type { AttributionFields } from './types';
 import { supabase } from '@/lib/supabase';
 
+// TypeScript declaration for debug function
+declare global {
+  interface Window {
+    checkUtmInTable: () => Promise<void>;
+    forceWriteUtmToTable: () => Promise<void>;
+  }
+}
+
+window.forceWriteUtmToTable = async function() {
+  const stored = safeReadStored();
+  if (!stored) {
+    return;
+  }
+  
+  const record = {
+    utm_source: stored.utm.utm_source,
+    utm_medium: stored.utm.utm_medium,
+    utm_campaign: stored.utm.utm_campaign,
+    utm_content: stored.utm.utm_content,
+    utm_term: stored.utm.utm_term,
+    landing_path: window.location.pathname,
+    referrer: stored.referrer,
+    captured_at: stored.first_seen_at,
+    attribution_id: stored.attribution_id,
+  };
+  
+  
+  const { error } = await supabase
+    .from('utm_tracking')
+    .upsert(record, { onConflict: 'attribution_id', ignoreDuplicates: true });
+  
+  if (error) {
+    return;
+  }
+  
+  // Update localStorage
+  stored.first_touch_sent = true;
+  stored.last_seen_at = nowIso();
+  safeWriteStored(stored);
+};
+
+window.checkUtmInTable = async function() {
+  const stored = safeReadStored();
+  if (!stored) {
+    return;
+  }
+  
+  const { data, error } = await supabase
+    .from('utm_tracking')
+    .select('*')
+    .eq('attribution_id', stored.attribution_id);
+  
+  if (error) {
+    return;
+  }
+  
+  if (data && data.length > 0) {
+  } else {
+  }
+};
+
 export const ATTRIBUTION_STORAGE_KEY = 'egg_attribution_v1';
 const ATTRIBUTION_TTL_DAYS = 90;
 const ATTRIBUTION_TTL_MS = ATTRIBUTION_TTL_DAYS * 24 * 60 * 60 * 1000;
@@ -42,17 +103,23 @@ function safeReadStored(): StoredAttribution | undefined {
   if (typeof window === 'undefined') return undefined;
   try {
     const raw = window.localStorage?.getItem(ATTRIBUTION_STORAGE_KEY);
-    if (!raw) return undefined;
+    if (!raw) {
+      return undefined;
+    }
     const parsed = JSON.parse(raw) as StoredAttribution;
-    if (!parsed || parsed.v !== 1) return undefined;
-    if (typeof parsed.attribution_id !== 'string') return undefined;
+    if (!parsed || parsed.v !== 1) {
+      return undefined;
+    }
+    if (typeof parsed.attribution_id !== 'string') {
+      return undefined;
+    }
     const lastSeen = Date.parse(parsed.last_seen_at || parsed.first_seen_at);
     if (!Number.isFinite(lastSeen) || Date.now() - lastSeen > ATTRIBUTION_TTL_MS) {
       window.localStorage?.removeItem(ATTRIBUTION_STORAGE_KEY);
       return undefined;
     }
     return parsed;
-  } catch {
+  } catch (e) {
     return undefined;
   }
 }
@@ -97,6 +164,8 @@ export function captureAttributionFromWindow(options: { persist: boolean }): Sto
   const utm = pickUtmFromSearch(params);
   const referrer = sanitizeReferrer(document.referrer || '');
 
+  console.info('[UTM Tracking] Capturing UTM from URL:', { utm, referrer, hasExisting: !!stored });
+
   const timestamp = nowIso();
   const next: StoredAttribution = {
     v: 1,
@@ -110,13 +179,14 @@ export function captureAttributionFromWindow(options: { persist: boolean }): Sto
 
   if (options.persist) {
     safeWriteStored(next);
-    console.info('[Attribution] stored first-touch data', {
+    console.info('[UTM Tracking] Stored in localStorage:', {
       attribution_id: next.attribution_id,
       utm: next.utm,
       referrer: next.referrer,
+      first_seen_at: next.first_seen_at,
     });
   } else {
-    console.info('[Attribution] capture skipped (persist=false)');
+    console.info('[UTM Tracking] Capture skipped (persist=false)');
   }
   return next;
 }
@@ -148,16 +218,19 @@ export function sanitizeDestination(url: string): string {
 }
 
 export async function writeFirstTouchOnceIfAllowed(options: { persistAllowed: boolean }): Promise<void> {
-  if (!options.persistAllowed) return;
+  if (!options.persistAllowed) {
+    console.info('[UTM Tracking] persist not allowed, skipping...');
+    return;
+  }
   if (typeof window === 'undefined') return;
 
   const stored = safeReadStored();
   if (!stored) {
-    console.info('[Attribution] no stored data; skip insert');
+    console.info('[UTM Tracking] No stored data found in localStorage');
     return;
   }
   if (stored.first_touch_sent) {
-    console.info('[Attribution] already sent; skip insert', { attribution_id: stored.attribution_id });
+    console.info('[UTM Tracking] Already sent to table, skipping', { attribution_id: stored.attribution_id });
     return;
   }
 
@@ -173,18 +246,25 @@ export async function writeFirstTouchOnceIfAllowed(options: { persistAllowed: bo
     attribution_id: stored.attribution_id,
   };
 
+  console.info('[UTM Tracking]  Preparing to save to database...', record);
+
   try {
-    const { error } = await supabase
+    const { error, data } = await supabase
       .from('utm_tracking')
       .upsert(record, { onConflict: 'attribution_id', ignoreDuplicates: true });
+    
     if (error) {
-      console.warn('[Attribution] insert failed', { message: error.message });
+      console.error('[UTM Tracking]  FAILED to save to table:', { 
+        message: error.message, 
+        details: error.details,
+        hint: error.hint,
+        record: record
+      });
       return;
     }
+    
+    console.info('[UTM Tracking]  SUCCESS! Data saved to utm_tracking table:', record);
     safeWriteStored({ ...stored, first_touch_sent: true, last_seen_at: nowIso() });
-    console.info('[Attribution] insert ok', { attribution_id: stored.attribution_id });
-  } catch {
-    // ignore
-    console.warn('[Attribution] insert threw error');
+  } catch (err) {
   }
 }
