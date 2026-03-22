@@ -13,18 +13,17 @@ export default function useTranslation(): { t: { consent?: ConsentStrings } } {
   const consent =
     language === 'de'
       ? {
-          title: 'Cookies & Analytics',
-          description: 'Wir nutzen Analyse-Cookies, um die Experience zu verbessern. Du kannst akzeptieren oder ablehnen.',
-          accept: 'Akzeptieren',
+          title: 'Datenschutz-Einstellungen',
+          description: 'Erlaube Spielanalyse, damit wir die Experience verbessern können. Marketing bleibt optional.',
+          accept: 'Tracking erlauben',
           decline: 'Ablehnen',
         }
       : {
-          title: 'Cookies & Analytics',
-          description: 'We use analytics cookies to improve the experience. You can accept or decline.',
-          accept: 'Accept',
+          title: 'Privacy settings',
+          description: 'Allow gameplay analytics to help us improve the experience. Marketing stays optional.',
+          accept: 'Allow tracking',
           decline: 'Decline',
         };
 
   return { t: { consent } };
 }
-

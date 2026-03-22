@@ -8,6 +8,7 @@ type ConsentValue = null | ConsentCookieValue;
 type ConsentContextValue = {
   consent: ConsentValue;
   setConsent: (next: ConsentCookieValue) => void;
+  ready: boolean;
 };
 
 const ConsentContext = createContext<ConsentContextValue | undefined>(undefined);
@@ -78,7 +79,7 @@ export function ConsentProvider(props: { children: React.ReactNode }) {
     window.dispatchEvent(new CustomEvent('egg:consent_update'));
   };
 
-  return <ConsentContext.Provider value={{ consent, setConsent }}>{props.children}</ConsentContext.Provider>;
+  return <ConsentContext.Provider value={{ consent, setConsent, ready: true }}>{props.children}</ConsentContext.Provider>;
 }
 
 export function useConsent() {

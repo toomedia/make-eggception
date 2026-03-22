@@ -126,10 +126,10 @@ export interface Translations {
 export const translations: Record<Language, Translations> = {
   de: {
     consent: {
-      title: 'Cookies & Analytics',
-      description: 'Wir nutzen Analyse-Cookies, um die Experience zu verbessern. Du kannst akzeptieren oder ablehnen.',
+      title: 'Datenschutz-Einstellungen',
+      description: 'Erlaube Spielanalyse, damit wir die Experience verbessern können. Marketing bleibt optional.',
       decline: 'Ablehnen',
-      accept: 'Akzeptieren',
+      accept: 'Tracking erlauben',
     },
     nav: {
       games: 'Spiele',
@@ -248,10 +248,10 @@ export const translations: Record<Language, Translations> = {
   },
   en: {
     consent: {
-      title: 'Cookies & Analytics',
-      description: 'We use analytics cookies to improve the experience. You can accept or decline.',
+      title: 'Privacy settings',
+      description: 'Allow gameplay analytics to help us improve the experience. Marketing stays optional.',
       decline: 'Decline',
-      accept: 'Accept',
+      accept: 'Allow tracking',
     },
     nav: {
       games: 'Games',

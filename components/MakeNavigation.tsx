@@ -49,21 +49,20 @@ export default function MakeNavigation() {
   };
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 ${
-        theme === 'dark'
-          ? 'bg-[var(--bg-primary)]/80 border-b border-black'
-          : 'bg-[var(--bg-secondary)]/80 border-b border-white'
-      } backdrop-blur-md`}
-    >
+    <nav className="fixed top-0 left-0 right-0 z-50 nav-surface border-b border-[var(--border-color)]">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <a
+      <a
           href={appendAttributionToUrl(EXTERNAL_URLS.home)}
           onClick={(e) => handleOutboundClick(e, 'nav_logo', EXTERNAL_URLS.home)}
-          className={`text-2xl font-bold hover:text-[var(--accent-primary)] transition-colors ${
-            theme === 'dark' ? 'text-white' : 'text-[var(--text-primary)]'
-          }`}
+          className="text-2xl font-bold text-[var(--text-primary)] hover:text-[var(--accent-primary)] transition-colors flex items-center"
         >
+      <img
+            src="/egg-mascot.png"
+            alt="Eggception mascot with orange sunglasses"
+            className="h-13 flex-shrink-0 object-contain drop-shadow-md"
+            width={50}
+            height={50}
+          />
           Eggception
         </a>
 
