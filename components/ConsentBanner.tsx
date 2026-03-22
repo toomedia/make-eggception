@@ -57,12 +57,22 @@ export function ConsentBanner() {
     const consentAppShell = document.getElementById("consent-app-shell");
     if (!consentAppShell) return;
 
+    try {
+      (consentAppShell as HTMLElement & { inert?: boolean }).inert = blocked;
+    } catch {
+      // Ignore inert property assignment issues and fall back to attributes/styles.
+    }
+
     if (blocked) {
       consentAppShell.setAttribute("inert", "");
       consentAppShell.setAttribute("aria-hidden", "true");
+      consentAppShell.style.pointerEvents = "none";
+      consentAppShell.style.userSelect = "none";
     } else {
       consentAppShell.removeAttribute("inert");
       consentAppShell.removeAttribute("aria-hidden");
+      consentAppShell.style.pointerEvents = "";
+      consentAppShell.style.userSelect = "";
     }
   };
 
