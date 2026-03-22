@@ -45,37 +45,6 @@ export function ConsentBanner() {
 
   const requiresDecision = ready && !consent;
 
-  const releaseConsentGateShell = () => {
-    const consentGateShell = document.getElementById("consent-gate-shell") as HTMLDialogElement | null;
-    if (consentGateShell?.open) {
-      consentGateShell.close();
-    }
-    consentGateShell?.remove();
-  };
-
-  const setAppShellBlocked = (blocked: boolean) => {
-    const consentAppShell = document.getElementById("consent-app-shell");
-    if (!consentAppShell) return;
-
-    try {
-      (consentAppShell as HTMLElement & { inert?: boolean }).inert = blocked;
-    } catch {
-      // Ignore inert property assignment issues and fall back to attributes/styles.
-    }
-
-    if (blocked) {
-      consentAppShell.setAttribute("inert", "");
-      consentAppShell.setAttribute("aria-hidden", "true");
-      consentAppShell.style.pointerEvents = "none";
-      consentAppShell.style.userSelect = "none";
-    } else {
-      consentAppShell.removeAttribute("inert");
-      consentAppShell.removeAttribute("aria-hidden");
-      consentAppShell.style.pointerEvents = "";
-      consentAppShell.style.userSelect = "";
-    }
-  };
-
   useEffect(() => {
     setLocale(language === "de" ? "de" : "en");
   }, [language]);
@@ -102,15 +71,8 @@ export function ConsentBanner() {
 
     if (requiresDecision) {
       setStep((prev) => prev ?? 1);
-      setAppShellBlocked(true);
-      const frameId = window.requestAnimationFrame(() => {
-        releaseConsentGateShell();
-      });
-      return () => window.cancelAnimationFrame(frameId);
+      return;
     }
-
-    setAppShellBlocked(false);
-    releaseConsentGateShell();
 
     if (!showStep3 && step === 1) {
       setStep(null);
@@ -162,8 +124,6 @@ export function ConsentBanner() {
     const openPreferences = () => {
       setShowStep3(false);
       setStep(2);
-      setAppShellBlocked(false);
-      releaseConsentGateShell();
     };
 
     window.addEventListener("openConsentPreferences", openPreferences);
@@ -187,8 +147,6 @@ export function ConsentBanner() {
       setStep(null);
       setShowStep3(false);
       setToast(buildToastMessage(normalized, locale));
-      setAppShellBlocked(false);
-      releaseConsentGateShell();
     },
     [locale, setConsent]
   );
