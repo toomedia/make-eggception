@@ -33,7 +33,7 @@ function normalizeDraft(state: ConsentState): ConsentState {
 }
 
 export function ConsentBanner() {
-  const { language } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const { consent, setConsent, ready } = useConsent();
   const [locale, setLocale] = useState<Locale>(language === "de" ? "de" : "en");
   const [step, setStep] = useState<ConsentStep | null>(null);
@@ -189,6 +189,41 @@ export function ConsentBanner() {
                 style={{ background: "hsl(var(--consent-border))" }}
                 aria-hidden="true"
               />
+
+              <div className="mb-5 flex justify-end">
+                <div
+                  className="inline-flex items-center rounded-xl border p-0.5"
+                  style={{
+                    borderColor: "hsl(var(--consent-border))",
+                    background: "var(--consent-surface)",
+                    boxShadow: "0 1px 2px hsl(var(--consent-navy) / 0.06)",
+                  }}
+                  role="group"
+                  aria-label="Language switcher"
+                >
+                  {(["en", "de"] as const).map((lang) => {
+                    const active = locale === lang;
+                    return (
+                      <button
+                        key={lang}
+                        type="button"
+                        onClick={() => {
+                          if (locale !== lang) setLanguage(lang);
+                        }}
+                        className="consent-focus min-w-[40px] rounded-[10px] border px-3 py-1.5 text-xs font-bold uppercase transition-colors"
+                        style={{
+                          borderColor: active ? "hsl(var(--consent-orange))" : "transparent",
+                          background: active ? "var(--consent-surface-elevated)" : "transparent",
+                          color: active ? "hsl(var(--consent-navy))" : "hsl(var(--consent-muted-text))",
+                        }}
+                        aria-pressed={active}
+                      >
+                        {lang.toUpperCase()}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
               {step === 1 && (
                 <Step1Banner
