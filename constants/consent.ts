@@ -2,19 +2,19 @@ export const CONSENT_COPY = {
   en: {
     step1: {
       eyebrow: "PRIVACY SETTINGS",
-      title: "Help us make Eggception better",
+      title: "Help us improve Eggception",
       description:
-        "We're a young indie game studio. With your permission, we use Game Analytics to spot rage quits, broken flows, unfair matchups, device and browser issues, and balance problems faster. That helps us continuously improve performance, 1v1 quality, and AI-powered matchmaking. Marketing stays optional and separate.",
-      reassurance: "The game works just fine even if you decline optional tracking.",
+        "If you agree, we may check how the game is running. This helps us spot when games end early, technical problems happen, or opponents are not matched fairly. That lets us fix issues faster and improve the game. Advertising stays separate and optional.",
+      reassurance: "You can still play normally without agreeing to this.",
       chips: {
-        alwaysOn: "Always on: Security, login, matchmaking",
-        analytics: "Optional: Game Analytics",
-        marketing: "Optional: Marketing",
+        alwaysOn: "Always on: Security, sign-in, finding opponents",
+        analytics: "Optional: Game analysis",
+        marketing: "Optional: Advertising",
       },
       actions: {
         allowAll: "Allow all",
-        allowAnalytics: "Allow Game Analytics",
-        necessaryOnly: "Necessary only",
+        allowAnalytics: "Allow game analysis",
+        necessaryOnly: "Continue without analysis",
         customize: "Customize choices",
       },
     },
@@ -112,20 +112,20 @@ export const CONSENT_COPY = {
   },
   de: {
     step1: {
-      eyebrow: "DATENSCHUTZ-EINSTELLUNGEN",
+      eyebrow: "DATENSCHUTZEINSTELLUNGEN",
       title: "Hilf uns, Eggception besser zu machen",
       description:
-        "Wir sind ein junges Game-Studio. Mit deiner Zustimmung nutzen wir Spielanalysen, um Rage-Quits, Spielabbrüche, unfaire Matchups, Geräte- und Browserprobleme sowie Balance-Themen schneller zu erkennen. So können wir Performance, das 1v1-Erlebnis und unser KI-gestütztes Matchmaking laufend verbessern. Marketing bleibt optional und getrennt.",
-      reassurance: "Das Spiel läuft auch ohne optionales Tracking ganz normal.",
+        "Wenn du zustimmst, dürfen wir prüfen, wie das Spiel läuft. So erkennen wir schneller, wenn Spiele abgebrochen werden, technische Probleme auftreten oder Gegner nicht gut zusammenpassen. So können wir Fehler schneller beheben und das Spiel verbessern. Werbung bleibt freiwillig und getrennt.",
+      reassurance: "Du kannst auch ohne diese Zustimmung ganz normal spielen.",
       chips: {
-        alwaysOn: "Immer aktiv: Sicherheit, Login, Matchmaking",
-        analytics: "Optional: Spielanalyse",
-        marketing: "Optional: Marketing",
+        alwaysOn: "Immer aktiv: Sicherheit, Anmeldung, Gegnersuche",
+        analytics: "Freiwillig: Spielanalyse",
+        marketing: "Freiwillig: Werbung",
       },
       actions: {
         allowAll: "Alles erlauben",
         allowAnalytics: "Spielanalyse erlauben",
-        necessaryOnly: "Nur notwendige Funktionen",
+        necessaryOnly: "Ohne Analyse weiterspielen",
         customize: "Auswahl anpassen",
       },
     },
