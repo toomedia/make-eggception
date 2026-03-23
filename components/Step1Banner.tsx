@@ -38,7 +38,7 @@ export function Step1Banner({ locale, onAllowAnalytics, onNecessaryOnly }: Step1
       {/* Hero row */}
       <div className="flex items-start gap-4 mb-4">
         <Image
-          src="/egg-mascot.png"
+          src="/logo.png"
           alt="Eggception mascot with orange sunglasses"
           width={80}
           height={80}

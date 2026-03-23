@@ -57,7 +57,7 @@ export default function MakeNavigation() {
           className="text-2xl font-bold text-[var(--text-primary)] hover:text-[var(--accent-primary)] transition-colors flex items-center"
         >
       <img
-            src="/egg-mascot.png"
+            src="/logo.png"
             alt="Eggception mascot with orange sunglasses"
             className="h-13 flex-shrink-0 object-contain drop-shadow-md"
             width={50}
