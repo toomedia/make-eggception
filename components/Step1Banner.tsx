@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { X } from "lucide-react";
 import { t, Locale } from "@/constants/consent";
 
 interface Step1Props {
@@ -7,7 +6,6 @@ interface Step1Props {
   onAllowAnalytics: () => void;
   onNecessaryOnly: () => void;
   onCustomize: () => void;
-  onClose: () => void;
 }
 
 function parseChip(raw: string) {
@@ -27,7 +25,6 @@ export function Step1Banner({
   onAllowAnalytics,
   onNecessaryOnly,
   onCustomize,
-  onClose,
 }: Step1Props) {
   const copy = t(locale).step1;
   const chips = [
@@ -67,18 +64,7 @@ export function Step1Banner({
             {copy.title}
           </h2>
         </div>
-        <div className="flex shrink-0 items-start gap-2">
-          {/* Modal language buttons intentionally hidden for now. */}
-          {/* <button
-            type="button"
-            onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-full transition-colors"
-            style={{ color: "hsl(var(--consent-muted-text))" }}
-            aria-label="Close"
-          >
-            <X size={16} />
-          </button> */}
-        </div>
+        {/* Close button intentionally commented out for now. */}
       </div>
 
       <div className="mx-7 h-px" style={{ background: "hsl(var(--consent-border))" }} />

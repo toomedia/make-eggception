@@ -196,7 +196,6 @@ export function ConsentBanner() {
                   onAllowAnalytics={() => commit(ANALYTICS_ONLY, "gate_accept_analytics")}
                   onNecessaryOnly={() => commit(NONE, "gate_reject_all")}
                   onCustomize={() => setStep(2)}
-                  onClose={() => commit(NONE, "gate_dismiss")}
                 />
               )}
 
