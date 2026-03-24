@@ -69,7 +69,7 @@ export function Step1Banner({
         </div>
         <div className="flex shrink-0 items-start gap-2">
           {/* Modal language buttons intentionally hidden for now. */}
-          <button
+          {/* <button
             type="button"
             onClick={onClose}
             className="flex h-9 w-9 items-center justify-center rounded-full transition-colors"
@@ -77,7 +77,7 @@ export function Step1Banner({
             aria-label="Close"
           >
             <X size={16} />
-          </button>
+          </button> */}
         </div>
       </div>
 
