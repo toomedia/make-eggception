@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { Language, translations, Translations } from './translations'
+import { getUserLanguage, setUserLanguagePreference, syncDocumentLanguage } from './userLanguage'
 
 interface LanguageContextType {
   language: Language
@@ -11,58 +12,18 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
-function readLangCookie(): Language | null {
-  if (typeof document === 'undefined') return null
-  const match = document.cookie.match(/(?:^|; )lang=([^;]+)/)
-  const value = match?.[1]
-  return value === 'de' || value === 'en' ? value : null
-}
-
-function writeLangCookie(lang: Language) {
-  if (typeof document === 'undefined') return
-  const isEggceptionDomain =
-    typeof window !== 'undefined' &&
-    window.location.hostname.endsWith('eggception.club')
-
-  document.cookie = [
-    `lang=${lang}`,
-    'Path=/',
-    'Max-Age=31536000',
-    'SameSite=Lax',
-    'Secure',
-    isEggceptionDomain ? 'Domain=.eggception.club' : ''
-  ]
-    .filter(Boolean)
-    .join('; ')
-}
-
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('de')
+  const [language, setLanguageState] = useState<Language>('en')
 
   useEffect(() => {
-    // 1) Cookie (cross-subdomain)
-    const cookieLang = readLangCookie()
-    if (cookieLang) {
-      setLanguageState(cookieLang)
-      document.documentElement.lang = cookieLang
-      localStorage.setItem('language', cookieLang)
-      return
-    }
-
-    // 2) Local storage
-    const savedLanguage = localStorage.getItem('language') as Language | null
-    if (savedLanguage && (savedLanguage === 'de' || savedLanguage === 'en')) {
-      setLanguageState(savedLanguage)
-      document.documentElement.lang = savedLanguage
-      return
-    }
+    const resolvedLanguage = getUserLanguage()
+    setLanguageState(resolvedLanguage)
+    syncDocumentLanguage(resolvedLanguage)
   }, [])
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)
-    localStorage.setItem('language', lang)
-    document.documentElement.lang = lang
-    writeLangCookie(lang)
+    setUserLanguagePreference(lang)
   }
 
   const t = translations[language]

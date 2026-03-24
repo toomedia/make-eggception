@@ -1,116 +1,154 @@
 import Image from "next/image";
-import { ConsentChip } from "./ConsentChip";
+import { X } from "lucide-react";
 import { t, Locale } from "@/constants/consent";
 
 interface Step1Props {
   locale: Locale;
   onAllowAnalytics: () => void;
   onNecessaryOnly: () => void;
+  onCustomize: () => void;
+  onClose: () => void;
 }
 
-export function Step1Banner({ locale, onAllowAnalytics, onNecessaryOnly }: Step1Props) {
-  const copy = t(locale).step1;
+function parseChip(raw: string) {
+  const colonIndex = raw.indexOf(":");
+  if (colonIndex === -1) {
+    return { label: raw, description: "" };
+  }
 
-  // Parse chip strings: "Label: detail" → split on first ":"
+  return {
+    label: raw.slice(0, colonIndex).trim(),
+    description: raw.slice(colonIndex + 1).trim(),
+  };
+}
+
+export function Step1Banner({
+  locale,
+  onAllowAnalytics,
+  onNecessaryOnly,
+  onCustomize,
+  onClose,
+}: Step1Props) {
+  const copy = t(locale).step1;
   const chips = [
-    { raw: copy.chips.alwaysOn, variant: "required" as const },
-    { raw: copy.chips.analytics, variant: "optional" as const },
-    { raw: copy.chips.marketing, variant: "optional" as const },
-  ].map(({ raw, variant }) => {
-    const colonIdx = raw.indexOf(":");
-    return {
-      label: raw.slice(0, colonIdx).trim(),
-      detail: raw.slice(colonIdx + 1).trim(),
-      variant,
-    };
-  });
+    { ...parseChip(copy.chips.alwaysOn), required: true },
+    { ...parseChip(copy.chips.analytics), required: false },
+    { ...parseChip(copy.chips.marketing), required: false },
+  ];
 
   return (
-    <div className="flex flex-col">
-      {/* Eyebrow */}
-      <p
-        className="text-[11px] font-bold tracking-widest uppercase mb-3"
-        style={{ color: "hsl(var(--consent-orange))" }}
-      >
-        {copy.eyebrow}
-      </p>
-
-      {/* Hero row */}
-      <div className="flex items-start gap-4 mb-4">
+    <div
+      className="w-full overflow-hidden rounded-[2rem]"
+      style={{
+        background: "var(--consent-surface)",
+        border: "1px solid hsl(var(--consent-border))",
+        boxShadow: "0 28px 90px hsl(var(--consent-navy) / 0.18)",
+      }}
+    >
+      <div className="px-7 pb-5 pt-7 flex items-center gap-4">
         <Image
           src="/logo.png"
-          alt="Eggception mascot with orange sunglasses"
-          width={80}
-          height={80}
-          className="animate-egg-float w-20 h-20 flex-shrink-0 object-contain drop-shadow-md"
-          draggable={false}
+          alt="Eggception"
+          width={56}
+          height={56}
+          className="h-14 w-14 shrink-0 object-contain"
         />
-        <div>
+        <div className="min-w-0 flex-1">
+          <p
+            className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.18em]"
+            style={{ color: "hsl(var(--consent-orange))" }}
+          >
+            {copy.eyebrow}
+          </p>
           <h2
-            className="text-xl font-extrabold leading-snug mb-2"
+            className="text-[2rem] font-extrabold leading-tight tracking-[-0.03em] text-balance"
             style={{ color: "hsl(var(--consent-navy))" }}
           >
             {copy.title}
           </h2>
-          <p
-            className="text-[13px] leading-relaxed"
+        </div>
+        <div className="flex shrink-0 items-start gap-2">
+          {/* Modal language buttons intentionally hidden for now. */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-9 w-9 items-center justify-center rounded-full transition-colors"
             style={{ color: "hsl(var(--consent-muted-text))" }}
+            aria-label="Close"
           >
-            {copy.description}
-          </p>
+            <X size={16} />
+          </button>
         </div>
       </div>
 
-      {/* Trust line */}
-      <p
-        className="text-[12px] font-medium mb-3 flex items-center gap-1.5"
-        style={{ color: "hsl(var(--consent-green))" }}
-      >
-        <span className="inline-block w-2 h-2 rounded-full flex-shrink-0"
-          style={{ background: "hsl(var(--consent-green))" }} />
-        {copy.reassurance}
-      </p>
+      <div className="mx-7 h-px" style={{ background: "hsl(var(--consent-border))" }} />
 
-      {/* Info chips */}
-      <div className="flex flex-wrap gap-1.5 mb-5">
-        {chips.map((chip) => (
-          <ConsentChip key={chip.detail} {...chip} />
-        ))}
+      <div className="px-7 py-6 space-y-5">
+        <p className="text-[15px] leading-8" style={{ color: "hsl(var(--consent-navy))" }}>
+          {copy.description}
+        </p>
+
+        <div className="flex flex-wrap gap-2">
+          {chips.map((chip) => (
+            <span
+              key={`${chip.label}-${chip.description}`}
+              className="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[12px] font-semibold"
+              style={{
+                borderColor: chip.required ? "hsl(var(--consent-orange) / 0.28)" : "hsl(var(--consent-border))",
+                background: chip.required ? "hsl(var(--consent-orange-soft))" : "hsl(var(--consent-muted))",
+                color: chip.required ? "hsl(var(--consent-orange))" : "hsl(var(--consent-muted-text))",
+              }}
+            >
+              <span>{chip.label}</span>
+              <span className="opacity-60">·</span>
+              <span>{chip.description}</span>
+            </span>
+          ))}
+        </div>
+
+        <p className="text-[12px] italic leading-relaxed" style={{ color: "hsl(var(--consent-muted-text))" }}>
+          {copy.reassurance}
+        </p>
       </div>
 
-      {/* ── Equal-weight action buttons ───────────────────────────────── */}
-      <div
-        className="grid gap-2.5"
-        style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-        role="group"
-        aria-label="Consent options"
-      >
-        {[
-          { label: copy.actions.allowAnalytics, onClick: onAllowAnalytics, id: "btn-allow-analytics" },
-          { label: copy.actions.necessaryOnly, onClick: onNecessaryOnly, id: "btn-necessary" },
-        ].map(({ label, onClick, id }) => (
+      <div className="mx-7 h-px" style={{ background: "hsl(var(--consent-border))" }} />
+
+      <div className="px-7 py-6 space-y-3">
+        <div className="flex gap-3">
           <button
-            key={id}
-            id={id}
-            onClick={onClick}
-            className="consent-focus rounded-xl px-3 py-3 text-[13px] font-semibold border-2 leading-tight text-center transition-all duration-150 hover:scale-[1.02] active:scale-[0.98]"
+            type="button"
+            onClick={onNecessaryOnly}
+            className="flex-1 rounded-full border-2 px-4 py-3.5 text-[14px] font-semibold transition-colors"
             style={{
-              borderColor: "hsl(var(--consent-navy))",
+              borderColor: "hsl(var(--consent-border))",
               color: "hsl(var(--consent-navy))",
               background: "transparent",
             }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "hsl(var(--consent-navy))";
-              (e.currentTarget as HTMLButtonElement).style.color = "#fff";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-              (e.currentTarget as HTMLButtonElement).style.color = "hsl(var(--consent-navy))";
+          >
+            {copy.actions.necessaryOnly}
+          </button>
+          <button
+            type="button"
+            onClick={onAllowAnalytics}
+            className="flex-1 rounded-full px-4 py-3.5 text-[14px] font-bold text-white transition-opacity"
+            style={{
+              background: "hsl(var(--consent-navy))",
+              boxShadow: "0 18px 38px hsl(var(--consent-navy) / 0.16)",
             }}
           >
-            {label}
+            {copy.actions.allowAnalytics}
           </button>
-        ))}
+        </div>
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={onCustomize}
+            className="text-[12px] underline underline-offset-2 transition-colors"
+            style={{ color: "hsl(var(--consent-muted-text))" }}
+          >
+            {copy.actions.customize}
+          </button>
+        </div>
       </div>
     </div>
   );

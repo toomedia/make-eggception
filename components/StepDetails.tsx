@@ -1,128 +1,125 @@
-import { X, ExternalLink } from "lucide-react";
+import { X, Globe, Clock, Layers, ExternalLink } from "lucide-react";
 import { Locale, t } from "@/constants/consent";
 
 interface Step3DetailsProps {
   locale: Locale;
+  open: boolean;
   onClose: () => void;
 }
 
-export function Step3Details({ locale, onClose }: Step3DetailsProps) {
+export function Step3Details({ locale, open, onClose }: Step3DetailsProps) {
   const copy = t(locale).step3;
 
   return (
-    /* Drawer overlay */
-    <div
-      className="fixed inset-0 z-[60] flex justify-end"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Vendor details"
-    >
-      {/* Scrim */}
-      <button
-        className="absolute inset-0 bg-black/30 cursor-default"
+    <>
+      <div
+        className={`absolute inset-0 rounded-[2rem] transition-opacity duration-200 ${
+          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        style={{ background: "hsl(220 30% 10% / 0.45)" }}
         onClick={onClose}
-        aria-label="Close vendor details"
-        tabIndex={-1}
       />
 
-      {/* Drawer panel */}
       <div
-        className="animate-drawer-in relative flex h-full w-full max-w-sm flex-col overflow-y-auto shadow-2xl"
+        className={`absolute inset-x-0 bottom-0 flex max-h-[82%] flex-col rounded-b-[2rem] rounded-t-[1.5rem] transition-transform duration-300 ease-out ${
+          open ? "translate-y-0" : "translate-y-full"
+        }`}
         style={{
-          borderRadius: "1.25rem 0 0 1.25rem",
           background: "var(--consent-surface)",
-          borderLeft: "1px solid hsl(var(--consent-border))",
+          boxShadow: "0 -18px 40px hsl(var(--consent-navy) / 0.2)",
         }}
       >
-        {/* Drawer header */}
+        <div className="flex justify-center pb-1 pt-3 shrink-0">
+          <div className="h-1 w-10 rounded-full" style={{ background: "hsl(var(--consent-border))" }} />
+        </div>
+
         <div
-          className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 border-b"
+          className="flex items-center justify-between px-7 pb-4 pt-2 shrink-0"
           style={{
-            background: "var(--consent-surface)",
-            backdropFilter: "blur(8px)",
-            borderColor: "hsl(var(--consent-border))",
+            color: "hsl(var(--consent-navy))",
           }}
         >
-          <h3 className="text-base font-extrabold" style={{ color: "hsl(var(--consent-navy))" }}>
+          <h3 className="text-[15px] font-bold" style={{ color: "hsl(var(--consent-navy))" }}>
             {copy.title}
           </h3>
           <button
+            type="button"
             onClick={onClose}
-            className="consent-focus rounded-full p-1.5 transition-colors hover:bg-[hsl(var(--consent-muted))]"
-            aria-label="Close"
+            className="flex items-center gap-1.5 text-[13px] font-medium transition-colors"
+            style={{ color: "hsl(var(--consent-muted-text))" }}
           >
-            <X size={18} style={{ color: "hsl(var(--consent-muted-text))" }} />
+            <X size={15} />
+            {copy.close}
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex flex-col gap-4 p-5">
+        <div className="mx-7 h-px shrink-0" style={{ background: "hsl(var(--consent-border))" }} />
+
+        <div className="flex-1 overflow-y-auto overscroll-contain px-7 py-5 space-y-3">
           {copy.vendors.map((vendor) => (
             <div
               key={vendor.name}
-              className="rounded-xl border p-4"
-              style={{
-                borderColor: "hsl(var(--consent-border))",
-                background: "var(--consent-surface-elevated)",
-              }}
+              className="space-y-3 rounded-[1.5rem] px-5 py-4"
+              style={{ background: "hsl(var(--consent-muted))" }}
             >
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <h4 className="font-bold text-[14px]" style={{ color: "hsl(var(--consent-navy))" }}>
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-[13px] font-bold" style={{ color: "hsl(var(--consent-navy))" }}>
                   {vendor.name}
-                </h4>
+                </p>
                 <a
                   href={vendor.privacy}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="consent-focus flex items-center gap-1 text-[11px] font-medium underline underline-offset-2 flex-shrink-0"
+                  className="flex items-center gap-1 text-[11px] font-medium underline underline-offset-2"
                   style={{ color: "hsl(var(--consent-orange))" }}
                 >
-                  Privacy policy
+                  Privacy
                   <ExternalLink size={11} />
                 </a>
               </div>
 
-              <dl className="flex flex-col gap-1.5 text-[12px]">
-                <div className="flex gap-2">
-                  <dt className="font-semibold w-20 flex-shrink-0" style={{ color: "hsl(var(--consent-navy))" }}>
-                    {copy.purposesLabel}
-                  </dt>
-                  <dd style={{ color: "hsl(var(--consent-muted-text))" }}>
+              <div className="space-y-1.5">
+                <div className="flex items-start gap-2">
+                  <Layers size={11} className="mt-0.5 shrink-0" style={{ color: "hsl(var(--consent-orange))" }} />
+                  <p className="text-[11px] leading-snug" style={{ color: "hsl(var(--consent-muted-text))" }}>
+                    <span className="font-semibold" style={{ color: "hsl(var(--consent-navy))" }}>
+                      {copy.purposesLabel}:{" "}
+                    </span>
                     {vendor.purposes.join(", ")}
-                  </dd>
+                  </p>
                 </div>
-                <div className="flex gap-2">
-                  <dt className="font-semibold w-20 flex-shrink-0" style={{ color: "hsl(var(--consent-navy))" }}>
-                    {copy.retentionLabel}
-                  </dt>
-                  <dd style={{ color: "hsl(var(--consent-muted-text))" }}>
+                <div className="flex items-start gap-2">
+                  <Clock size={11} className="mt-0.5 shrink-0" style={{ color: "hsl(var(--consent-orange))" }} />
+                  <p className="text-[11px] leading-snug" style={{ color: "hsl(var(--consent-muted-text))" }}>
+                    <span className="font-semibold" style={{ color: "hsl(var(--consent-navy))" }}>
+                      {copy.retentionLabel}:{" "}
+                    </span>
                     {vendor.retention}
-                  </dd>
+                  </p>
                 </div>
-                <div className="flex gap-2">
-                  <dt className="font-semibold w-20 flex-shrink-0" style={{ color: "hsl(var(--consent-navy))" }}>
-                    {copy.transferLabel}
-                  </dt>
-                  <dd style={{ color: "hsl(var(--consent-muted-text))" }}>
+                <div className="flex items-start gap-2">
+                  <Globe size={11} className="mt-0.5 shrink-0" style={{ color: "hsl(var(--consent-orange))" }} />
+                  <p className="text-[11px] leading-snug" style={{ color: "hsl(var(--consent-muted-text))" }}>
+                    <span className="font-semibold" style={{ color: "hsl(var(--consent-navy))" }}>
+                      {copy.transferLabel}:{" "}
+                    </span>
                     {vendor.country}
-                  </dd>
+                  </p>
                 </div>
-              </dl>
+              </div>
             </div>
           ))}
+        </div>
 
-          {/* Change anytime note */}
+        <div className="shrink-0 border-t px-7 py-4" style={{ borderColor: "hsl(var(--consent-border))" }}>
           <p
-            className="text-[12px] leading-relaxed rounded-xl p-3.5"
-            style={{
-              background: "hsl(var(--consent-muted))",
-              color: "hsl(var(--consent-muted-text))",
-            }}
+            className="text-[11px] italic leading-relaxed"
+            style={{ color: "hsl(var(--consent-muted-text))" }}
           >
             {copy.changeAnytime}
           </p>
         </div>
       </div>
-    </div>
+    </>
   );
 }

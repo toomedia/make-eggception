@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useConsent } from "./ConsentContext";
+import { PrivacyChip } from "./PrivacyChip";
 import { Step1Banner } from "./Step1Banner";
 import { Step2Preferences } from "./Step2Preferences";
-import { Step3Details } from "./StepDetails";
 import { ConsentToast } from "./ConsentToast";
 import { ConsentState, ConsentStep, DEFAULT_CONSENT } from "./types";
 import { Locale, t } from "@/constants/consent";
@@ -33,21 +33,18 @@ function normalizeDraft(state: ConsentState): ConsentState {
 }
 
 export function ConsentBanner() {
-  const { language, setLanguage } = useLanguage();
+  const { language } = useLanguage();
   const { consent, setConsent, ready } = useConsent();
-  const [locale, setLocale] = useState<Locale>(language === "de" ? "de" : "en");
+  const locale: Locale = language === "de" ? "de" : "en";
   const [step, setStep] = useState<ConsentStep | null>(null);
   const [showStep3, setShowStep3] = useState(false);
   const [saved, setSaved] = useState(false);
   const [draft, setDraft] = useState<ConsentState>(DEFAULT_CONSENT);
   const [toast, setToast] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const copy = t(locale);
 
   const requiresDecision = ready && !consent;
-
-  useEffect(() => {
-    setLocale(language === "de" ? "de" : "en");
-  }, [language]);
 
   useEffect(() => {
     if (!ready) return;
@@ -151,6 +148,22 @@ export function ConsentBanner() {
     [locale, setConsent]
   );
 
+  const closePreferences = () => {
+    setShowStep3(false);
+
+    if (!saved) {
+      commit(NONE, "gate_dismiss");
+      return;
+    }
+
+    setDraft({
+      analytics: consent?.analytics ?? false,
+      replay: consent?.analytics ?? false,
+      marketing: consent?.marketing ?? false,
+    });
+    setStep(null);
+  };
+
   if (!ready) return null;
   if (step === null && !saved) return null;
 
@@ -159,12 +172,12 @@ export function ConsentBanner() {
       {step !== null && (
         <>
           <div
-            className="animate-backdrop-in fixed inset-0 z-50 flex items-end justify-center md:items-center"
-            style={{ background: "hsl(var(--consent-navy) / 0.55)", backdropFilter: "blur(4px)" }}
+            className="animate-backdrop-in fixed inset-0 z-[80] flex items-end justify-center md:items-center"
+            style={{ background: "hsl(var(--consent-navy) / 0.48)", backdropFilter: "blur(8px)" }}
             aria-hidden="true"
           />
           <div
-            className="fixed inset-0 z-50 flex items-end justify-center md:items-center pointer-events-none"
+            className="fixed inset-0 z-[80] flex items-end justify-center md:items-center pointer-events-none p-3 sm:p-4"
             role="dialog"
             aria-modal="true"
             aria-label="Privacy settings"
@@ -172,64 +185,18 @@ export function ConsentBanner() {
             <div
               ref={modalRef}
               className={`
-                pointer-events-auto w-full md:max-w-[640px]
-                rounded-t-3xl md:rounded-3xl
-                px-5 py-6 md:p-8
+                pointer-events-auto w-full md:max-w-[620px]
                 ${step === 1 ? "animate-sheet-in md:animate-consent-in" : "animate-consent-in"}
                 max-h-[90dvh] overflow-y-auto
               `}
-              style={{
-                background: "var(--consent-surface)",
-                border: "1px solid hsl(var(--consent-border))",
-                boxShadow: "0 24px 64px hsl(var(--consent-navy) / 0.22)",
-              }}
             >
-              <div
-                className="w-10 h-1 rounded-full mx-auto mb-5 md:hidden"
-                style={{ background: "hsl(var(--consent-border))" }}
-                aria-hidden="true"
-              />
-
-              <div className="mb-5 flex justify-end">
-                <div
-                  className="inline-flex items-center rounded-xl border p-0.5"
-                  style={{
-                    borderColor: "hsl(var(--consent-border))",
-                    background: "var(--consent-surface)",
-                    boxShadow: "0 1px 2px hsl(var(--consent-navy) / 0.06)",
-                  }}
-                  role="group"
-                  aria-label="Language switcher"
-                >
-                  {(["en", "de"] as const).map((lang) => {
-                    const active = locale === lang;
-                    return (
-                      <button
-                        key={lang}
-                        type="button"
-                        onClick={() => {
-                          if (locale !== lang) setLanguage(lang);
-                        }}
-                        className="consent-focus min-w-[40px] rounded-[10px] border px-3 py-1.5 text-xs font-bold uppercase transition-colors"
-                        style={{
-                          borderColor: active ? "hsl(var(--consent-orange))" : "transparent",
-                          background: active ? "var(--consent-surface-elevated)" : "transparent",
-                          color: active ? "hsl(var(--consent-navy))" : "hsl(var(--consent-muted-text))",
-                        }}
-                        aria-pressed={active}
-                      >
-                        {lang.toUpperCase()}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
               {step === 1 && (
                 <Step1Banner
                   locale={locale}
                   onAllowAnalytics={() => commit(ANALYTICS_ONLY, "gate_accept_analytics")}
                   onNecessaryOnly={() => commit(NONE, "gate_reject_all")}
+                  onCustomize={() => setStep(2)}
+                  onClose={() => commit(NONE, "gate_dismiss")}
                 />
               )}
 
@@ -242,7 +209,9 @@ export function ConsentBanner() {
                   onAllowAll={() => commit(ALL, "preferences_allow_all")}
                   onNecessaryOnly={() => commit(NONE, "preferences_necessary_only")}
                   onViewDetails={() => setShowStep3(true)}
-                  onBack={() => setStep(saved ? null : 1)}
+                  onClose={closePreferences}
+                  detailsOpen={showStep3}
+                  onCloseDetails={() => setShowStep3(false)}
                 />
               )}
 
@@ -251,11 +220,9 @@ export function ConsentBanner() {
         </>
       )}
 
-      {showStep3 && <Step3Details locale={locale} onClose={() => setShowStep3(false)} />}
-
-      {/* {saved && step === null && !showStep3 && (
+      {saved && step === null && !showStep3 && (
         <PrivacyChip label={copy.privacyChip} onClick={() => setStep(2)} />
-      )} */}
+      )}
 
       {toast && <ConsentToast message={toast} onDone={() => setToast(null)} />}
     </>

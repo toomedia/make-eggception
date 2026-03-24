@@ -1,49 +1,31 @@
 import Image from "next/image";
-import { Shield, Video, Megaphone } from "lucide-react";
+import { Lock, X } from "lucide-react";
 import { ConsentState } from "./types";
 import { Locale, t } from "@/constants/consent";
+import { Step3Details } from "./StepDetails";
 
-// Map icon identifiers to components
-function CategoryIcon({ icon, name }: { icon: string; name: string }) {
-  if (icon === "pixel-egg") {
-    return <Image src="/egg-pixel.png" alt={name} width={22} height={22} className="object-contain" />;
-  }
-  if (icon === "shield") return <Shield size={22} strokeWidth={1.8} style={{ color: "hsl(var(--consent-orange))" }} />;
-  if (icon === "video") return <Video size={22} strokeWidth={1.8} style={{ color: "hsl(var(--consent-navy))" }} />;
-  if (icon === "megaphone") return <Megaphone size={22} strokeWidth={1.8} style={{ color: "hsl(var(--consent-muted-text))" }} />;
-  return null;
-}
-
-// Toggle switch
-function Toggle({ checked, onChange, disabled, id }: {
-  checked: boolean; onChange: (v: boolean) => void; disabled?: boolean; id: string;
+function Toggle({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: () => void;
 }) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
-      id={id}
-      disabled={disabled}
-      onClick={() => !disabled && onChange(!checked)}
-      className="consent-focus relative flex-shrink-0 rounded-full transition-colors duration-150 focus:outline-none"
+      onClick={onChange}
+      className="relative inline-flex h-8 w-14 items-center rounded-full transition-colors"
       style={{
-        width: 42,
-        height: 24,
-        background: disabled
-          ? "hsl(var(--consent-orange))"
-          : checked
-            ? "hsl(var(--consent-navy))"
-            : "hsl(var(--consent-border))",
-        cursor: disabled ? "not-allowed" : "pointer",
+        background: checked ? "hsl(var(--consent-navy))" : "hsl(var(--consent-border) / 0.7)",
       }}
     >
       <span
-        className="absolute top-[3px] rounded-full bg-white shadow-sm transition-transform duration-150"
+        className="absolute top-1 h-6 w-6 rounded-full bg-white shadow-md transition-transform"
         style={{
-          width: 18,
-          height: 18,
-          transform: (disabled || checked) ? "translateX(20px)" : "translateX(3px)",
+          transform: checked ? "translateX(30px)" : "translateX(4px)",
         }}
       />
     </button>
@@ -58,175 +40,176 @@ interface Step2Props {
   onAllowAll: () => void;
   onNecessaryOnly: () => void;
   onViewDetails: () => void;
-  onBack: () => void;
+  onClose: () => void;
+  detailsOpen: boolean;
+  onCloseDetails: () => void;
 }
 
-export function Step2Preferences({ locale, state, onChange, onSave, onAllowAll, onNecessaryOnly, onViewDetails, onBack }: Step2Props) {
+export function Step2Preferences({
+  locale,
+  state,
+  onChange,
+  onSave,
+  onAllowAll,
+  onNecessaryOnly,
+  onViewDetails,
+  onClose,
+  detailsOpen,
+  onCloseDetails,
+}: Step2Props) {
   const copy = t(locale).step2;
 
-  const getVal = (id: string): boolean => {
-    if (id === "necessary") return true;
-    if (id === "analytics") return state.analytics;
-    if (id === "replay") return state.replay;
-    if (id === "marketing") return state.marketing;
-    return false;
-  };
-
-  const setVal = (id: string, val: boolean) => {
-    if (id === "analytics") {
-      onChange({
-        ...state,
-        analytics: val,
-        replay: val ? state.replay : false,
-      });
-      return;
-    }
-
-    if (id === "replay") {
-      onChange({
-        ...state,
-        analytics: val ? true : state.analytics,
-        replay: val,
-      });
-      return;
-    }
-
-    onChange({
-      ...state,
-      marketing: id === "marketing" ? val : state.marketing,
-    });
-  };
-
   return (
-    <div className="flex flex-col">
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-1">
-        <button
-          onClick={onBack}
-          className="consent-focus rounded-lg p-1 -ml-1 transition-colors hover:bg-[hsl(var(--consent-muted))]"
-          aria-label="Back to summary"
-          style={{ color: "hsl(var(--consent-muted-text))" }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5M12 5l-7 7 7 7"/>
-          </svg>
-        </button>
-        <div>
-          <h2 className="text-lg font-extrabold leading-tight" style={{ color: "hsl(var(--consent-navy))" }}>
+    <div
+      className="relative flex max-h-[90vh] w-full flex-col overflow-hidden rounded-[2rem]"
+      style={{
+        background: "var(--consent-surface)",
+        border: "1px solid hsl(var(--consent-border))",
+        boxShadow: "0 28px 90px hsl(var(--consent-navy) / 0.18)",
+      }}
+    >
+      <div className="shrink-0 flex items-center gap-4 px-7 pb-5 pt-7">
+        <Image src="/logo.png" alt="Eggception" width={56} height={56} className="h-14 w-14 shrink-0 object-contain" />
+        <div className="min-w-0 flex-1">
+          <h2 className="text-[2rem] font-extrabold leading-tight tracking-[-0.03em]" style={{ color: "hsl(var(--consent-navy))" }}>
             {copy.title}
           </h2>
-          <p className="text-[12px]" style={{ color: "hsl(var(--consent-muted-text))" }}>
+          <p className="mt-0.5 text-[13px]" style={{ color: "hsl(var(--consent-muted-text))" }}>
             {copy.subtitle}
           </p>
         </div>
-      </div>
-
-      {/* Category cards */}
-      <div className="flex flex-col gap-2.5 mt-3 mb-4">
-        {copy.categories.map((cat) => {
-          const isOn = getVal(cat.id);
-          return (
-            <div
-              key={cat.id}
-              className="flex items-start gap-3 rounded-xl p-3.5 border"
-              style={{
-                borderColor: isOn && !cat.locked
-                  ? "hsl(var(--consent-navy) / 0.2)"
-                  : "hsl(var(--consent-border))",
-                background: isOn && !cat.locked
-                  ? "hsl(var(--consent-navy) / 0.03)"
-                  : "transparent",
-              }}
-            >
-              {/* Icon */}
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: "hsl(var(--consent-muted))" }}
-              >
-                <CategoryIcon icon={cat.icon} name={cat.name} />
-              </div>
-
-              {/* Text */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                  <span className="text-[13px] font-bold" style={{ color: "hsl(var(--consent-navy))" }}>
-                    {cat.name}
-                  </span>
-                  <span
-                    className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                    style={{
-                      background: cat.locked
-                        ? "hsl(var(--consent-orange-soft))"
-                        : "hsl(var(--consent-muted))",
-                      color: cat.locked
-                        ? "hsl(var(--consent-orange))"
-                        : "hsl(var(--consent-muted-text))",
-                    }}
-                  >
-                    {cat.badge}
-                  </span>
-                </div>
-                <p className="text-[12px] leading-relaxed" style={{ color: "hsl(var(--consent-muted-text))" }}>
-                  {cat.description}
-                </p>
-              </div>
-
-              {/* Toggle */}
-              <div className="flex-shrink-0 mt-0.5">
-                <Toggle
-                  id={`toggle-${cat.id}`}
-                  checked={isOn}
-                  onChange={(v) => setVal(cat.id, v)}
-                  disabled={cat.locked}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Actions */}
-      <div className="flex flex-col gap-2">
-        <button
-          onClick={onSave}
-          className="consent-focus w-full rounded-xl py-3 text-[14px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.99]"
-          style={{
-            background: "hsl(var(--consent-navy))",
-            color: "#fff",
-          }}
-        >
-          {copy.btnSave}
-        </button>
-        <div className="grid grid-cols-2 gap-2">
-          {[
-            { label: copy.btnAllowAll, onClick: onAllowAll },
-            { label: copy.btnNecessary, onClick: onNecessaryOnly },
-          ].map(({ label, onClick }) => (
-            <button
-              key={label}
-              onClick={onClick}
-              className="consent-focus rounded-xl py-2.5 text-[13px] font-semibold border-2 transition-all duration-150 hover:bg-[hsl(var(--consent-muted))]"
-              style={{
-                borderColor: "hsl(var(--consent-border))",
-                color: "hsl(var(--consent-navy))",
-              }}
-            >
-              {label}
-            </button>
-          ))}
+        <div className="flex shrink-0 items-start gap-2">
+          {/* Modal language buttons intentionally hidden for now. */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+            style={{ color: "hsl(var(--consent-muted-text))" }}
+            aria-label="Close"
+          >
+            <X size={16} />
+          </button>
         </div>
       </div>
 
-      {/* Vendor link */}
-      <div className="text-center mt-3">
-        <button
-          onClick={onViewDetails}
-          className="consent-focus text-[12px] font-medium underline underline-offset-2 transition-opacity hover:opacity-70"
-          style={{ color: "hsl(var(--consent-muted-text))" }}
-        >
-          {copy.vendorLink}
-        </button>
+      <div className="mx-7 h-px shrink-0" style={{ background: "hsl(var(--consent-border))" }} />
+
+      <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="space-y-3 px-7 py-6">
+          {copy.categories
+            .filter((category) => category.id !== "replay")
+            .map((category) => {
+              const isLocked = category.locked;
+              const isOn = isLocked ? true : category.id === "analytics" ? state.analytics : state.marketing;
+
+              return (
+                <div
+                  key={category.id}
+                  className="rounded-[1.5rem] px-5 py-4 flex items-start gap-4"
+                  style={{
+                    background: "hsl(var(--consent-muted))",
+                  }}
+                >
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[14px] font-bold" style={{ color: "hsl(var(--consent-navy))" }}>
+                        {category.name}
+                      </span>
+                      <span
+                        className="rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                        style={{
+                          background: isLocked ? "hsl(var(--consent-orange-soft))" : "var(--consent-surface)",
+                          borderColor: isLocked ? "hsl(var(--consent-orange) / 0.28)" : "hsl(var(--consent-border))",
+                          color: isLocked ? "hsl(var(--consent-orange))" : "hsl(var(--consent-muted-text))",
+                        }}
+                      >
+                        {category.badge}
+                      </span>
+                    </div>
+                    <p className="text-[12px] leading-relaxed" style={{ color: "hsl(var(--consent-muted-text))" }}>
+                      {category.description}
+                    </p>
+                  </div>
+
+                  <div className="shrink-0 mt-0.5">
+                    {isLocked ? (
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-full"
+                        style={{ background: "hsl(var(--consent-orange-soft))", color: "hsl(var(--consent-orange))" }}
+                      >
+                        <Lock size={14} />
+                      </div>
+                    ) : (
+                      <Toggle
+                        checked={isOn}
+                        onChange={() =>
+                          onChange({
+                            ...state,
+                            analytics: category.id === "analytics" ? !state.analytics : state.analytics,
+                            replay: category.id === "analytics" ? !state.analytics : state.replay,
+                            marketing: category.id === "marketing" ? !state.marketing : state.marketing,
+                          })
+                        }
+                      />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+
+          <div className="text-center pt-1 pb-1">
+            <button
+              type="button"
+              onClick={onViewDetails}
+              className="text-[12px] underline underline-offset-2 transition-colors"
+              style={{ color: "hsl(var(--consent-muted-text))" }}
+            >
+              {copy.vendorLink}
+            </button>
+          </div>
+        </div>
       </div>
+
+      <div className="shrink-0">
+        <div className="mx-7 h-px" style={{ background: "hsl(var(--consent-border))" }} />
+        <div className="space-y-2.5 px-7 py-6">
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onNecessaryOnly}
+              className="flex-1 rounded-full border-2 px-4 py-3.5 text-[14px] font-semibold transition-colors"
+              style={{
+                borderColor: "hsl(var(--consent-border))",
+                color: "hsl(var(--consent-navy))",
+                background: "transparent",
+              }}
+            >
+              {copy.btnNecessary}
+            </button>
+            <button
+              type="button"
+              onClick={onSave}
+              className="flex-1 rounded-full px-4 py-3.5 text-[14px] font-bold text-white transition-opacity"
+              style={{
+                background: "hsl(var(--consent-navy))",
+                boxShadow: "0 18px 38px hsl(var(--consent-navy) / 0.16)",
+              }}
+            >
+              {copy.btnSave}
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={onAllowAll}
+            className="w-full rounded-full py-2.5 text-[13px] font-medium transition-colors"
+            style={{ color: "hsl(var(--consent-muted-text))" }}
+          >
+            {copy.btnAllowAll}
+          </button>
+        </div>
+      </div>
+
+      <Step3Details locale={locale} open={detailsOpen} onClose={onCloseDetails} />
     </div>
   );
 }

@@ -8,7 +8,6 @@ import { appendAttributionToUrl, sanitizeDestination } from '@/lib/egg-analytics
 import { EXTERNAL_URLS, type CtaId } from '@/lib/egg-analytics/ctas';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useTheme } from '@/lib/ThemeContext';
-import { PrimaryButton } from '@/components/ui/custom-buttons';
 
 export default function Home() {
   const { t: tObj } = useLanguage();
@@ -101,7 +100,7 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col gap-5 items-center mb-10 sm:mb-12 w-full max-w-md mx-auto">
-            <PrimaryButton
+            <button
               type="button"
               onClick={() =>
                 trackAndRedirect({
@@ -111,10 +110,10 @@ export default function Home() {
                   delayMs: 120,
                 })
               }
-              className="w-full sm:w-auto min-h-[40px] text-lg sm:text-xl font-bold shadow-2xl focus:ring-4 focus:ring-[var(--accent-primary)]/50 focus:outline-none transform hover:scale-105 transition-transform"
+              className="inline-block w-full rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-8 py-3 text-center text-lg font-semibold text-white shadow-2xl transition-all duration-200 hover:scale-105 hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-[var(--accent-primary)]/50 sm:w-auto sm:min-h-[40px] sm:text-xl"
             >
               {t('hero.createEgg')}
-            </PrimaryButton>
+            </button>
             <a
               href={appendAttributionToUrl(EXTERNAL_URLS.games)}
               onClick={(e) =>

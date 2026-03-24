@@ -200,3 +200,117 @@ a {
 .animate-egg-float {
   animation: egg-float 3.6s ease-in-out infinite;
 }
+
+.funnel-page {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, hsl(var(--consent-orange) / 0.18) 0, transparent 34%),
+    radial-gradient(circle at top right, hsl(var(--consent-navy) / 0.18) 0, transparent 38%),
+    linear-gradient(180deg, #0d1320 0%, #101827 42%, #0b111c 100%);
+}
+
+[data-theme="light"] .funnel-page {
+  background:
+    radial-gradient(circle at top left, hsl(var(--consent-orange) / 0.16) 0, transparent 34%),
+    radial-gradient(circle at top right, hsl(var(--consent-navy) / 0.12) 0, transparent 38%),
+    linear-gradient(180deg, #fff8f1 0%, #fffefc 34%, #f7f8fc 100%);
+}
+
+.funnel-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(hsl(var(--consent-navy) / 0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9), transparent 92%);
+  pointer-events: none;
+}
+
+.funnel-page-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.funnel-card {
+  background: hsl(222 22% 12% / 0.82);
+  border: 1px solid hsl(var(--consent-border));
+  box-shadow: 0 24px 70px hsl(220 40% 2% / 0.32);
+}
+
+[data-theme="light"] .funnel-card {
+  background: hsl(0 0% 100% / 0.78);
+  box-shadow: 0 24px 70px hsl(var(--consent-navy) / 0.08);
+}
+
+.funnel-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid hsl(var(--consent-orange) / 0.18);
+  background: hsl(var(--consent-orange-soft));
+  color: hsl(var(--consent-orange));
+  padding: 0.45rem 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.funnel-button-primary,
+.funnel-button-secondary,
+.btn-primary,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border-radius: 999px;
+  padding: 0.9rem 1.5rem;
+  font-weight: 700;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.funnel-button-primary,
+.btn-primary {
+  background: hsl(var(--consent-navy));
+  color: white;
+  border: 1px solid hsl(var(--consent-navy));
+  box-shadow: 0 16px 40px hsl(var(--consent-navy) / 0.18);
+}
+
+.funnel-button-primary:hover,
+.funnel-button-secondary:hover,
+.btn-primary:hover,
+.btn-secondary:hover {
+  transform: translateY(-1px);
+}
+
+.funnel-button-secondary,
+.btn-secondary {
+  background: hsl(222 22% 16% / 0.86);
+  color: hsl(var(--consent-navy));
+  border: 1px solid hsl(var(--consent-border));
+}
+
+[data-theme="light"] .funnel-button-secondary,
+[data-theme="light"] .btn-secondary {
+  background: hsl(0 0% 100% / 0.72);
+}
+
+.funnel-button-secondary:hover,
+.btn-secondary:hover {
+  border-color: hsl(var(--consent-orange) / 0.22);
+}
+
+.funnel-glow-icon {
+  box-shadow:
+    0 0 0 1px hsl(var(--consent-orange) / 0.18),
+    0 16px 36px hsl(var(--consent-orange) / 0.16);
+}
