@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import { t, Locale } from "@/constants/consent";
 
 interface Step1Props {
@@ -39,7 +40,7 @@ export function Step1Banner({
       style={{
         background: "var(--consent-surface)",
         border: "1px solid hsl(var(--consent-border))",
-        boxShadow: "0 28px 90px hsl(var(--consent-navy) / 0.18)",
+        boxShadow: "0 28px 90px hsl(var(--consent-primary) / 0.18)",
       }}
     >
       <div className="px-7 pb-5 pt-7 flex items-center gap-4">
@@ -101,10 +102,12 @@ export function Step1Banner({
 
       <div className="px-7 py-6 space-y-3">
         <div className="flex gap-3">
-          <button
+          <Button
             type="button"
+            variant="pillOutline"
+            size="pill"
             onClick={onNecessaryOnly}
-            className="flex-1 rounded-full border-2 px-4 py-3.5 text-[14px] font-semibold transition-colors"
+            className="flex-1 border-2"
             style={{
               borderColor: "hsl(var(--consent-border))",
               color: "hsl(var(--consent-navy))",
@@ -112,18 +115,20 @@ export function Step1Banner({
             }}
           >
             {copy.actions.necessaryOnly}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="pillSolid"
+            size="pill"
             onClick={onAllowAnalytics}
-            className="flex-1 rounded-full px-4 py-3.5 text-[14px] font-bold text-white transition-opacity"
+            className="flex-1 font-bold text-white"
             style={{
-              background: "hsl(var(--consent-navy))",
-              boxShadow: "0 18px 38px hsl(var(--consent-navy) / 0.16)",
+              background: "hsl(var(--consent-primary))",
+              boxShadow: "0 18px 38px hsl(var(--consent-primary) / 0.16)",
             }}
           >
             {copy.actions.allowAnalytics}
-          </button>
+          </Button>
         </div>
         <div className="text-center">
           <button

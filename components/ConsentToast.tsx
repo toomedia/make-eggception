@@ -21,7 +21,7 @@ export function ConsentToast({ message, onDone }: ConsentToastProps) {
           background: "var(--consent-surface)",
           color: "hsl(var(--consent-navy))",
           borderColor: "hsl(var(--consent-border))",
-          boxShadow: "0 8px 24px hsl(var(--consent-navy) / 0.18)",
+          boxShadow: "0 8px 24px hsl(var(--consent-primary) / 0.18)",
         }}
       >
         {message}

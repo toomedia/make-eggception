@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ConsentState } from "./types";
 import { Locale, t } from "@/constants/consent";
 import { Step3Details } from "./StepDetails";
@@ -19,7 +20,7 @@ function Toggle({
       onClick={onChange}
       className="relative inline-flex h-8 w-14 items-center rounded-full transition-colors"
       style={{
-        background: checked ? "hsl(var(--consent-navy))" : "hsl(var(--consent-border) / 0.7)",
+        background: checked ? "hsl(var(--consent-primary))" : "hsl(var(--consent-border) / 0.7)",
       }}
     >
       <span
@@ -63,7 +64,7 @@ export function Step2Preferences({
       style={{
         background: "var(--consent-surface)",
         border: "1px solid hsl(var(--consent-border))",
-        boxShadow: "0 28px 90px hsl(var(--consent-navy) / 0.18)",
+        boxShadow: "0 28px 90px hsl(var(--consent-primary) / 0.18)",
       }}
     >
       <div className="shrink-0 flex items-center gap-4 px-7 pb-5 pt-7">
@@ -163,10 +164,12 @@ export function Step2Preferences({
         <div className="mx-7 h-px" style={{ background: "hsl(var(--consent-border))" }} />
         <div className="space-y-2.5 px-7 py-6">
           <div className="flex gap-3">
-            <button
+            <Button
               type="button"
+              variant="pillOutline"
+              size="pill"
               onClick={onNecessaryOnly}
-              className="flex-1 rounded-full border-2 px-4 py-3.5 text-[14px] font-semibold transition-colors"
+              className="flex-1 border-2"
               style={{
                 borderColor: "hsl(var(--consent-border))",
                 color: "hsl(var(--consent-navy))",
@@ -174,18 +177,20 @@ export function Step2Preferences({
               }}
             >
               {copy.btnNecessary}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="pillSolid"
+              size="pill"
               onClick={onSave}
-              className="flex-1 rounded-full px-4 py-3.5 text-[14px] font-bold text-white transition-opacity"
+              className="flex-1 font-bold text-white"
               style={{
-                background: "hsl(var(--consent-navy))",
-                boxShadow: "0 18px 38px hsl(var(--consent-navy) / 0.16)",
+                background: "hsl(var(--consent-primary))",
+                boxShadow: "0 18px 38px hsl(var(--consent-primary) / 0.16)",
               }}
             >
               {copy.btnSave}
-            </button>
+            </Button>
           </div>
           <button
             type="button"

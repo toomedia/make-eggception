@@ -26,7 +26,7 @@ export function Step3Details({ locale, open, onClose }: Step3DetailsProps) {
         }`}
         style={{
           background: "var(--consent-surface)",
-          boxShadow: "0 -18px 40px hsl(var(--consent-navy) / 0.2)",
+          boxShadow: "0 -18px 40px hsl(var(--consent-primary) / 0.2)",
         }}
       >
         <div className="flex justify-center pb-1 pt-3 shrink-0">

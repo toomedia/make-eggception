@@ -157,7 +157,7 @@ export function ConsentBanner() {
         <>
           <div
             className="animate-backdrop-in fixed inset-0 z-[80] flex items-end justify-center md:items-center"
-            style={{ background: "hsl(var(--consent-navy) / 0.48)", backdropFilter: "blur(8px)" }}
+            style={{ background: "hsl(var(--consent-primary) / 0.48)", backdropFilter: "blur(8px)" }}
             aria-hidden="true"
           />
           <div
