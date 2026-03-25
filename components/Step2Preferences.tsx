@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Lock, X } from "lucide-react";
+import { Lock } from "lucide-react";
 import { ConsentState } from "./types";
 import { Locale, t } from "@/constants/consent";
 import { Step3Details } from "./StepDetails";
@@ -40,7 +40,6 @@ interface Step2Props {
   onAllowAll: () => void;
   onNecessaryOnly: () => void;
   onViewDetails: () => void;
-  onClose: () => void;
   detailsOpen: boolean;
   onCloseDetails: () => void;
 }
@@ -53,7 +52,6 @@ export function Step2Preferences({
   onAllowAll,
   onNecessaryOnly,
   onViewDetails,
-  onClose,
   detailsOpen,
   onCloseDetails,
 }: Step2Props) {
@@ -80,15 +78,6 @@ export function Step2Preferences({
         </div>
         <div className="flex shrink-0 items-start gap-2">
           {/* Modal language buttons intentionally hidden for now. */}
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-full transition-colors"
-            style={{ color: "hsl(var(--consent-muted-text))" }}
-            aria-label="Close"
-          >
-            <X size={16} />
-          </button>
         </div>
       </div>
 

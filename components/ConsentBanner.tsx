@@ -148,22 +148,6 @@ export function ConsentBanner() {
     [locale, setConsent]
   );
 
-  const closePreferences = () => {
-    setShowStep3(false);
-
-    if (!saved) {
-      commit(NONE, "gate_dismiss");
-      return;
-    }
-
-    setDraft({
-      analytics: consent?.analytics ?? false,
-      replay: consent?.analytics ?? false,
-      marketing: consent?.marketing ?? false,
-    });
-    setStep(null);
-  };
-
   if (!ready) return null;
   if (step === null && !saved) return null;
 
@@ -208,7 +192,6 @@ export function ConsentBanner() {
                   onAllowAll={() => commit(ALL, "preferences_allow_all")}
                   onNecessaryOnly={() => commit(NONE, "preferences_necessary_only")}
                   onViewDetails={() => setShowStep3(true)}
-                  onClose={closePreferences}
                   detailsOpen={showStep3}
                   onCloseDetails={() => setShowStep3(false)}
                 />
