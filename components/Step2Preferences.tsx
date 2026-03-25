@@ -60,17 +60,17 @@ export function Step2Preferences({
 
   return (
     <div
-      className="relative flex max-h-[90vh] w-full flex-col overflow-hidden rounded-[2rem]"
+      className="relative flex max-h-[calc(100dvh-1.5rem)] w-full flex-col overflow-hidden rounded-[1.5rem] sm:max-h-[90vh] sm:rounded-[2rem]"
       style={{
         background: "var(--consent-surface)",
         border: "1px solid hsl(var(--consent-border))",
         boxShadow: "0 28px 90px hsl(var(--consent-primary) / 0.18)",
       }}
     >
-      <div className="shrink-0 flex items-center gap-4 px-7 pb-5 pt-7">
-        <Image src="/logo.png" alt="Eggception" width={56} height={56} className="h-14 w-14 shrink-0 object-contain" />
+      <div className="shrink-0 flex items-start gap-3 px-4 pb-4 pt-5 sm:items-center sm:gap-4 sm:px-7 sm:pb-5 sm:pt-7">
+        <Image src="/logo.png" alt="Eggception" width={56} height={56} className="h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14" />
         <div className="min-w-0 flex-1">
-          <h2 className="text-[2rem] font-extrabold leading-tight tracking-[-0.03em]" style={{ color: "hsl(var(--consent-navy))" }}>
+          <h2 className="text-[1.625rem] font-extrabold leading-tight tracking-[-0.03em] sm:text-[2rem]" style={{ color: "hsl(var(--consent-navy))" }}>
             {copy.title}
           </h2>
           <p className="mt-0.5 text-[13px]" style={{ color: "hsl(var(--consent-muted-text))" }}>
@@ -82,10 +82,10 @@ export function Step2Preferences({
         </div>
       </div>
 
-      <div className="mx-7 h-px shrink-0" style={{ background: "hsl(var(--consent-border))" }} />
+      <div className="mx-4 h-px shrink-0 sm:mx-7" style={{ background: "hsl(var(--consent-border))" }} />
 
       <div className="flex-1 overflow-y-auto overscroll-contain">
-        <div className="space-y-3 px-7 py-6">
+        <div className="space-y-3 px-4 py-5 sm:px-7 sm:py-6">
           {copy.categories
             .filter((category) => category.id !== "replay")
             .map((category) => {
@@ -95,7 +95,7 @@ export function Step2Preferences({
               return (
                 <div
                   key={category.id}
-                  className="rounded-[1.5rem] px-5 py-4 flex items-start gap-4"
+                  className="flex flex-col gap-3 rounded-[1.25rem] px-4 py-4 sm:flex-row sm:items-start sm:gap-4 sm:rounded-[1.5rem] sm:px-5"
                   style={{
                     background: "hsl(var(--consent-muted))",
                   }}
@@ -121,7 +121,7 @@ export function Step2Preferences({
                     </p>
                   </div>
 
-                  <div className="shrink-0 mt-0.5">
+                  <div className="mt-0.5 shrink-0 self-start sm:self-auto">
                     {isLocked ? (
                       <div
                         className="flex h-10 w-10 items-center justify-center rounded-full"
@@ -161,15 +161,15 @@ export function Step2Preferences({
       </div>
 
       <div className="shrink-0">
-        <div className="mx-7 h-px" style={{ background: "hsl(var(--consent-border))" }} />
-        <div className="space-y-2.5 px-7 py-6">
-          <div className="flex gap-3">
+        <div className="mx-4 h-px sm:mx-7" style={{ background: "hsl(var(--consent-border))" }} />
+        <div className="space-y-2.5 px-4 py-5 sm:px-7 sm:py-6">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <Button
               type="button"
               variant="pillOutline"
               size="pill"
               onClick={onNecessaryOnly}
-              className="flex-1 border-2"
+              className="w-full flex-1 border-2"
               style={{
                 borderColor: "hsl(var(--consent-border))",
                 color: "hsl(var(--consent-navy))",
@@ -183,7 +183,7 @@ export function Step2Preferences({
               variant="pillSolid"
               size="pill"
               onClick={onSave}
-              className="flex-1 font-bold text-white"
+              className="w-full flex-1 font-bold text-white"
               style={{
                 background: "hsl(var(--consent-primary))",
                 boxShadow: "0 18px 38px hsl(var(--consent-primary) / 0.16)",

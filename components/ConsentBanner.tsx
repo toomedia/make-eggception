@@ -169,9 +169,9 @@ export function ConsentBanner() {
             <div
               ref={modalRef}
               className={`
-                pointer-events-auto w-full md:max-w-[620px]
+                pointer-events-auto w-full max-w-[620px]
                 ${step === 1 ? "animate-sheet-in md:animate-consent-in" : "animate-consent-in"}
-                max-h-[90dvh] overflow-y-auto
+                max-h-[calc(100dvh-1.5rem)] overflow-y-auto sm:max-h-[90dvh]
               `}
             >
               {step === 1 && (

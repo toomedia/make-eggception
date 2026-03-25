@@ -36,20 +36,20 @@ export function Step1Banner({
 
   return (
     <div
-      className="w-full overflow-hidden rounded-[2rem]"
+      className="w-full overflow-hidden rounded-[1.5rem] sm:rounded-[2rem]"
       style={{
         background: "var(--consent-surface)",
         border: "1px solid hsl(var(--consent-border))",
         boxShadow: "0 28px 90px hsl(var(--consent-primary) / 0.18)",
       }}
     >
-      <div className="px-7 pb-5 pt-7 flex items-center gap-4">
+      <div className="flex items-start gap-3 px-4 pb-4 pt-5 sm:items-center sm:gap-4 sm:px-7 sm:pb-5 sm:pt-7">
         <Image
           src="/logo.png"
           alt="Eggception"
           width={56}
           height={56}
-          className="h-14 w-14 shrink-0 object-contain"
+          className="h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14"
         />
         <div className="min-w-0 flex-1">
           <p
@@ -59,7 +59,7 @@ export function Step1Banner({
             {copy.eyebrow}
           </p>
           <h2
-            className="text-[2rem] font-extrabold leading-tight tracking-[-0.03em] text-balance"
+            className="text-[1.625rem] font-extrabold leading-tight tracking-[-0.03em] text-balance sm:text-[2rem]"
             style={{ color: "hsl(var(--consent-navy))" }}
           >
             {copy.title}
@@ -68,10 +68,10 @@ export function Step1Banner({
         {/* Close button intentionally commented out for now. */}
       </div>
 
-      <div className="mx-7 h-px" style={{ background: "hsl(var(--consent-border))" }} />
+      <div className="mx-4 h-px sm:mx-7" style={{ background: "hsl(var(--consent-border))" }} />
 
-      <div className="px-7 py-6 space-y-5">
-        <p className="text-[15px] leading-8" style={{ color: "hsl(var(--consent-navy))" }}>
+      <div className="space-y-4 px-4 py-5 sm:space-y-5 sm:px-7 sm:py-6">
+        <p className="text-[14px] leading-7 sm:text-[15px] sm:leading-8" style={{ color: "hsl(var(--consent-navy))" }}>
           {copy.description}
         </p>
 
@@ -79,7 +79,7 @@ export function Step1Banner({
           {chips.map((chip) => (
             <span
               key={`${chip.label}-${chip.description}`}
-              className="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[12px] font-semibold"
+              className="inline-flex max-w-full flex-wrap items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold sm:px-3.5 sm:text-[12px]"
               style={{
                 borderColor: chip.required ? "hsl(var(--consent-orange) / 0.28)" : "hsl(var(--consent-border))",
                 background: chip.required ? "hsl(var(--consent-orange-soft))" : "hsl(var(--consent-muted))",
@@ -98,16 +98,16 @@ export function Step1Banner({
         </p>
       </div>
 
-      <div className="mx-7 h-px" style={{ background: "hsl(var(--consent-border))" }} />
+      <div className="mx-4 h-px sm:mx-7" style={{ background: "hsl(var(--consent-border))" }} />
 
-      <div className="px-7 py-6 space-y-3">
-        <div className="flex gap-3">
+      <div className="space-y-3 px-4 py-5 sm:px-7 sm:py-6">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <Button
             type="button"
             variant="pillOutline"
             size="pill"
             onClick={onNecessaryOnly}
-            className="flex-1 border-2"
+            className="w-full flex-1 border-2"
             style={{
               borderColor: "hsl(var(--consent-border))",
               color: "hsl(var(--consent-navy))",
@@ -121,7 +121,7 @@ export function Step1Banner({
             variant="pillSolid"
             size="pill"
             onClick={onAllowAnalytics}
-            className="flex-1 font-bold text-white"
+            className="w-full flex-1 font-bold text-white"
             style={{
               background: "hsl(var(--consent-primary))",
               boxShadow: "0 18px 38px hsl(var(--consent-primary) / 0.16)",

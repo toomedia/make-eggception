@@ -13,7 +13,7 @@ export function Step3Details({ locale, open, onClose }: Step3DetailsProps) {
   return (
     <>
       <div
-        className={`absolute inset-0 rounded-[2rem] transition-opacity duration-200 ${
+        className={`absolute inset-0 rounded-[1.5rem] transition-opacity duration-200 sm:rounded-[2rem] ${
           open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
         style={{ background: "hsl(220 30% 10% / 0.45)" }}
@@ -21,7 +21,7 @@ export function Step3Details({ locale, open, onClose }: Step3DetailsProps) {
       />
 
       <div
-        className={`absolute inset-x-0 bottom-0 flex max-h-[82%] flex-col rounded-b-[2rem] rounded-t-[1.5rem] transition-transform duration-300 ease-out ${
+        className={`absolute inset-x-0 bottom-0 flex max-h-[85%] flex-col rounded-b-[1.5rem] rounded-t-[1.25rem] transition-transform duration-300 ease-out sm:max-h-[82%] sm:rounded-b-[2rem] sm:rounded-t-[1.5rem] ${
           open ? "translate-y-0" : "translate-y-full"
         }`}
         style={{
@@ -34,7 +34,7 @@ export function Step3Details({ locale, open, onClose }: Step3DetailsProps) {
         </div>
 
         <div
-          className="flex items-center justify-between px-7 pb-4 pt-2 shrink-0"
+          className="flex items-center justify-between px-4 pb-4 pt-2 shrink-0 sm:px-7"
           style={{
             color: "hsl(var(--consent-navy))",
           }}
@@ -53,13 +53,13 @@ export function Step3Details({ locale, open, onClose }: Step3DetailsProps) {
           </button>
         </div>
 
-        <div className="mx-7 h-px shrink-0" style={{ background: "hsl(var(--consent-border))" }} />
+        <div className="mx-4 h-px shrink-0 sm:mx-7" style={{ background: "hsl(var(--consent-border))" }} />
 
-        <div className="flex-1 overflow-y-auto overscroll-contain px-7 py-5 space-y-3">
+        <div className="flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-5 sm:px-7">
           {copy.vendors.map((vendor) => (
             <div
               key={vendor.name}
-              className="space-y-3 rounded-[1.5rem] px-5 py-4"
+              className="space-y-3 rounded-[1.25rem] px-4 py-4 sm:rounded-[1.5rem] sm:px-5"
               style={{ background: "hsl(var(--consent-muted))" }}
             >
               <div className="flex items-start justify-between gap-3">
@@ -111,7 +111,7 @@ export function Step3Details({ locale, open, onClose }: Step3DetailsProps) {
           ))}
         </div>
 
-        <div className="shrink-0 border-t px-7 py-4" style={{ borderColor: "hsl(var(--consent-border))" }}>
+        <div className="shrink-0 border-t px-4 py-4 sm:px-7" style={{ borderColor: "hsl(var(--consent-border))" }}>
           <p
             className="text-[11px] italic leading-relaxed"
             style={{ color: "hsl(var(--consent-muted-text))" }}
